@@ -27,7 +27,11 @@
         "phpunit/phpunit": "^8.5",
         "symfony/phpunit-bridge": "^5.0"
     },
+    "scripts": {
+        "test": "@php ./vendor/bin/phpunit"
+    },
     "config": {
+        "sort-packages": true,
         "platform": {
             "php": "7.2.5"
         }
