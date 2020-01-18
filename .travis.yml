@@ -23,5 +23,5 @@ script:
   - composer phpcscheck
   - composer test -- --coverage-clover=clover.xml
 
-after_deploy:
+after_script:
   - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT
