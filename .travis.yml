@@ -13,9 +13,15 @@ cache:
     - $HOME/.composer/cache
 
 before_script:
+  - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
+  - chmod +x ./cc-test-reporter
+  - ./cc-test-reporter before-build
   - composer install -n
 
 script:
   - composer phpstan
   - composer phpcscheck
-  - composer test
+  - composer test -- --coverage-clover=clover.xml
+
+after_deploy:
+  - ./cc-test-reporter after-build --coverage-input-type clover --exit-code $TRAVIS_TEST_RESULT
