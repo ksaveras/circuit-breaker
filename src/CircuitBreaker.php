@@ -4,10 +4,17 @@ namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Symfony\Component\Cache\Adapter\NullAdapter;
+use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CircuitBreaker
 {
+    /**
+     * @var CacheInterface
+     */
+    private $cacheAdapter;
+
     /**
      * @var EventDispatcherInterface
      */
@@ -17,16 +24,6 @@ class CircuitBreaker
      * @var string
      */
     private $name;
-
-    /**
-     * @var string
-     */
-    private $state;
-
-    /**
-     * @var int
-     */
-    private $failureCount = 0;
 
     /**
      * @var float
@@ -49,13 +46,12 @@ class CircuitBreaker
     private $ratio;
 
     /**
-     * @var float|null
+     * @var Circuit
      */
-    private $lastFailure;
+    private $circuit;
 
     public function __construct(string $name, int $threshold = 5, float $resetPeriod = 60.0, float $ratio = 1.0)
     {
-        $this->state = State::CLOSED;
         $this->name = $name;
         $this->failureThreshold = $threshold;
         $this->resetTimeout = $this->resetPeriod = $resetPeriod;
@@ -76,7 +72,23 @@ class CircuitBreaker
 
     public function getState(): string
     {
-        return $this->state;
+        return $this->getCircuit()->getState();
+    }
+
+    public function getCacheAdapter(): CacheInterface
+    {
+        if (null === $this->cacheAdapter) {
+            $this->cacheAdapter = new NullAdapter();
+        }
+
+        return $this->cacheAdapter;
+    }
+
+    public function setCacheAdapter(CacheInterface $cacheAdapter): self
+    {
+        $this->cacheAdapter = $cacheAdapter;
+
+        return $this;
     }
 
     /**
@@ -117,33 +129,26 @@ class CircuitBreaker
 
     public function success(): void
     {
-        $this->failureCount = 0;
         $this->resetTimeout = $this->resetPeriod;
-        $this->lastFailure = null;
-
+        $this->getCircuit()->reset();
         $this->setState(State::CLOSED);
     }
 
     public function failure(): void
     {
-        ++$this->failureCount;
-        $this->lastFailure = microtime(true);
+        $this->getCircuit()->increaseFailure();
     }
 
     private function updateState(): void
     {
         $state = State::CLOSED;
 
-        if ($this->failureCount >= $this->failureThreshold) {
-            if ((microtime(true) - $this->lastFailure) > $this->resetTimeout) {
+        if ($this->getCircuit()->getFailureCount() >= $this->failureThreshold) {
+            if ((microtime(true) - $this->getCircuit()->getLastFailure()) > $this->resetTimeout) {
                 $state = State::HALF_OPEN;
             } else {
                 $state = State::OPEN;
             }
-        }
-
-        if (State::OPEN === $this->state && State::HALF_OPEN === $state) {
-            $this->resetTimeout *= $this->ratio;
         }
 
         $this->setState($state);
@@ -151,10 +156,39 @@ class CircuitBreaker
 
     private function setState(string $state): void
     {
-        if ($this->state !== $state && null !== $this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new StateChangeEvent($this, $this->state, $state));
+        $currentState = $this->getCircuit()->getState();
+
+        if (State::OPEN === $currentState && State::HALF_OPEN === $state) {
+            $this->resetTimeout *= $this->ratio;
         }
 
-        $this->state = $state;
+        if ($currentState !== $state && null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(new StateChangeEvent($this, $currentState, $state));
+        }
+
+        $this->getCircuit()->setState($state);
+    }
+
+    private function getCircuit(): Circuit
+    {
+        if (null === $this->circuit) {
+            $this->loadCircuit();
+        }
+
+        return $this->circuit;
+    }
+
+    private function loadCircuit(): void
+    {
+        $key = Circuit::cacheKey($this->name);
+
+        $this->circuit = $this->getCacheAdapter()->get(
+            $key,
+            static function () {
+                return (new Circuit())
+                    ->setState(State::CLOSED);
+            },
+            0
+        );
     }
 }

@@ -7,19 +7,26 @@ use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\State;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class CircuitBreakerTest extends TestCase
 {
     public function testNewCircuitBreakerIsClosed(): void
     {
+        $cache = new ArrayAdapter(3600);
+
         $service = new CircuitBreaker('demo');
+        $service->setCacheAdapter($cache);
 
         $this->assertEquals(State::CLOSED, $service->getState());
     }
 
     public function testCircuitBreaker(): void
     {
+        $cache = new ArrayAdapter(3600);
+
         $service = new CircuitBreaker('demo');
+        $service->setCacheAdapter($cache);
         $result = $service->call($this->successClosure('demo data'));
 
         $this->assertEquals('demo data', $result);
@@ -136,6 +143,25 @@ class CircuitBreakerTest extends TestCase
         $this->assertEquals(State::CLOSED, $service->getState());
 
         ClockMock::withClockMock(false);
+    }
+
+    public function testCircuitFunctions(): void
+    {
+        $service = new CircuitBreaker('demo', 2, 10);
+
+        $this->assertTrue($service->isAvailable());
+
+        $service->failure();
+
+        $this->assertTrue($service->isAvailable());
+
+        $service->failure();
+
+        $this->assertFalse($service->isAvailable());
+
+        $service->success();
+
+        $this->assertTrue($service->isAvailable());
     }
 
     private function failingClosure(): \Closure
