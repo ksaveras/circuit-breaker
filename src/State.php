@@ -2,6 +2,11 @@
 
 namespace Ksaveras\CircuitBreaker;
 
+/**
+ * Class State.
+ *
+ * @codeCoverageIgnore
+ */
 final class State
 {
     public const OPEN = 'open';
