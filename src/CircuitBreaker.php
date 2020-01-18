@@ -53,7 +53,7 @@ class CircuitBreaker
      */
     private $lastFailure;
 
-    public function __construct(string $name, int $threshold = 5, float $resetPeriod = 60, float $ratio = 1)
+    public function __construct(string $name, int $threshold = 5, float $resetPeriod = 60.0, float $ratio = 1.0)
     {
         $this->state = State::CLOSED;
         $this->name = $name;
@@ -79,6 +79,11 @@ class CircuitBreaker
         return $this->state;
     }
 
+    /**
+     * @return mixed
+     *
+     * @throws \Throwable
+     */
     public function call(\Closure $closure)
     {
         $this->updateState();
@@ -86,7 +91,6 @@ class CircuitBreaker
         switch ($this->getState()) {
             case State::OPEN:
                 throw CircuitBreakerException::openCircuit();
-                break;
             case State::CLOSED:
             case State::HALF_OPEN:
                 try {
@@ -99,10 +103,8 @@ class CircuitBreaker
 
                     throw $exception;
                 }
-                break;
             default:
                 throw new \LogicException('Unreachable code');
-                break;
         }
     }
 
@@ -124,7 +126,7 @@ class CircuitBreaker
 
     public function failure(): void
     {
-        $this->failureCount++;
+        ++$this->failureCount;
         $this->lastFailure = microtime(true);
     }
 

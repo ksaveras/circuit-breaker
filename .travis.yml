@@ -1,0 +1,21 @@
+language: php
+
+php:
+  - 7.2
+  - 7.3
+
+notifications:
+  email:
+    on_success: never
+
+cache:
+  directories:
+    - $HOME/.composer/cache
+
+before_script:
+  - composer install -n
+
+script:
+  - composer phpstan
+  - composer phpcscheck
+  - composer test

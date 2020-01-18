@@ -145,6 +145,9 @@ class CircuitBreakerTest extends TestCase
         };
     }
 
+    /**
+     * @param mixed $result
+     */
     private function successClosure($result = 'success'): \Closure
     {
         return static function () use ($result) {

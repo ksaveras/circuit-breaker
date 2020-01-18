@@ -7,10 +7,19 @@ use Symfony\Contracts\EventDispatcher\Event;
 
 class StateChangeEvent extends Event
 {
+    /**
+     * @var CircuitBreaker
+     */
     private $circuitBreaker;
 
+    /**
+     * @var string
+     */
     private $oldState;
 
+    /**
+     * @var string
+     */
     private $newState;
 
     public function __construct(CircuitBreaker $circuitBreaker, string $oldState, string $newState)
