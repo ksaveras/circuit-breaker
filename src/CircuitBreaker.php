@@ -132,14 +132,14 @@ class CircuitBreaker
 
     private function updateState(): void
     {
+        $state = State::CLOSED;
+
         if ($this->failureCount >= $this->failureThreshold) {
             if ((microtime(true) - $this->lastFailure) > $this->resetTimeout) {
                 $state = State::HALF_OPEN;
             } else {
                 $state = State::OPEN;
             }
-        } else {
-            $state = State::CLOSED;
         }
 
         if (State::OPEN === $this->state && State::HALF_OPEN === $state) {
