@@ -4,8 +4,6 @@ namespace Ksaveras\CircuitBreaker;
 
 class Circuit
 {
-    public const CACHE_PREFIX = 'CircuitBreaker';
-
     /**
      * @var string
      */
@@ -14,7 +12,7 @@ class Circuit
     /**
      * @var string
      */
-    private $state;
+    private $state = State::CLOSED;
 
     /**
      * @var int
@@ -26,9 +24,14 @@ class Circuit
      */
     private $lastFailure;
 
-    public static function cacheKey(string $name): string
+    /**
+     * Circuit constructor.
+     *
+     * @param string $name
+     */
+    public function __construct(string $name)
     {
-        return static::CACHE_PREFIX.'|'.md5($name);
+        $this->name = $name;
     }
 
     /**
@@ -37,18 +40,6 @@ class Circuit
     public function getName()
     {
         return $this->name;
-    }
-
-    /**
-     * @param mixed $name
-     *
-     * @return Circuit
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     /**
