@@ -4,26 +4,27 @@ namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
+use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 use Symfony\Component\Cache\Adapter\NullAdapter;
-use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CircuitBreaker
 {
     /**
-     * @var CacheInterface
+     * @var string
      */
-    private $cacheAdapter;
+    private $name;
+
+    /**
+     * @var StorageInterface
+     */
+    private $storage;
 
     /**
      * @var EventDispatcherInterface
      */
     private $eventDispatcher;
-
-    /**
-     * @var string
-     */
-    private $name;
 
     /**
      * @var float
@@ -45,14 +46,11 @@ class CircuitBreaker
      */
     private $ratio;
 
-    /**
-     * @var Circuit
-     */
-    private $circuit;
-
-    public function __construct(string $name, int $threshold = 5, float $resetPeriod = 60.0, float $ratio = 1.0)
+    public function __construct(string $name, StorageInterface $storage, int $threshold = 5, float $resetPeriod = 60.0, float $ratio = 1.0)
     {
-        $this->name = $name;
+        $this->name = AbstractStorage::validateKey($name);
+        $this->storage = $storage;
+
         $this->failureThreshold = $threshold;
         $this->resetTimeout = $this->resetPeriod = $resetPeriod;
         $this->ratio = $ratio;
@@ -75,18 +73,18 @@ class CircuitBreaker
         return $this->getCircuit()->getState();
     }
 
-    public function getCacheAdapter(): CacheInterface
+    public function getStorage(): StorageInterface
     {
-        if (null === $this->cacheAdapter) {
-            $this->cacheAdapter = new NullAdapter();
+        if (null === $this->storage) {
+            $this->storage = new NullAdapter();
         }
 
-        return $this->cacheAdapter;
+        return $this->storage;
     }
 
-    public function setCacheAdapter(CacheInterface $cacheAdapter): self
+    public function setStorage(StorageInterface $storage): self
     {
-        $this->cacheAdapter = $cacheAdapter;
+        $this->storage = $storage;
 
         return $this;
     }
@@ -129,14 +127,19 @@ class CircuitBreaker
 
     public function success(): void
     {
+        $circuit = $this->getCircuit();
         $this->resetTimeout = $this->resetPeriod;
-        $this->getCircuit()->reset();
+        $circuit->reset();
+        $this->storage->saveCircuit($circuit);
+
         $this->setState(State::CLOSED);
     }
 
     public function failure(): void
     {
-        $this->getCircuit()->increaseFailure();
+        $circuit = $this->getCircuit();
+        $circuit->increaseFailure();
+        $this->storage->saveCircuit($circuit);
     }
 
     private function updateState(): void
@@ -156,7 +159,8 @@ class CircuitBreaker
 
     private function setState(string $state): void
     {
-        $currentState = $this->getCircuit()->getState();
+        $circuit = $this->getCircuit();
+        $currentState = $circuit->getState();
 
         if (State::OPEN === $currentState && State::HALF_OPEN === $state) {
             $this->resetTimeout *= $this->ratio;
@@ -166,29 +170,31 @@ class CircuitBreaker
             $this->eventDispatcher->dispatch(new StateChangeEvent($this, $currentState, $state));
         }
 
-        $this->getCircuit()->setState($state);
+        $circuit->setState($state);
+        $this->storage->saveCircuit($circuit);
     }
 
     private function getCircuit(): Circuit
     {
-        if (null === $this->circuit) {
-            $this->loadCircuit();
-        }
-
-        return $this->circuit;
+        return $this->storage->getCircuit($this->name);
     }
 
-    private function loadCircuit(): void
+    private function saveCircuit(Circuit $circuit): void
     {
-        $key = Circuit::cacheKey($this->name);
-
-        $this->circuit = $this->getCacheAdapter()->get(
-            $key,
-            static function () {
-                return (new Circuit())
-                    ->setState(State::CLOSED);
-            },
-            0
-        );
+        $this->storage->saveCircuit($circuit);
     }
+
+//    private function loadCircuit(): void
+//    {
+//        $key = Circuit::cacheKey($this->name);
+//
+//        $this->circuit = $this->getStorage()->get(
+//            $key,
+//            static function () {
+//                return (new Circuit())
+//                    ->setState(State::CLOSED);
+//            },
+//            0
+//        );
+//    }
 }

@@ -1,32 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\State;
+use Ksaveras\CircuitBreaker\Storage\ArrayStorage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
-use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
+/**
+ * Class CircuitBreakerTest.
+ */
 class CircuitBreakerTest extends TestCase
 {
     public function testNewCircuitBreakerIsClosed(): void
     {
-        $cache = new ArrayAdapter(3600);
+        $storage = new ArrayStorage();
 
-        $service = new CircuitBreaker('demo');
-        $service->setCacheAdapter($cache);
+        $service = new CircuitBreaker('demo', $storage);
 
         $this->assertEquals(State::CLOSED, $service->getState());
     }
 
     public function testCircuitBreaker(): void
     {
-        $cache = new ArrayAdapter(3600);
+        $storage = new ArrayStorage();
 
-        $service = new CircuitBreaker('demo');
-        $service->setCacheAdapter($cache);
+        $service = new CircuitBreaker('demo', $storage);
         $result = $service->call($this->successClosure('demo data'));
 
         $this->assertEquals('demo data', $result);
@@ -35,7 +38,8 @@ class CircuitBreakerTest extends TestCase
 
     public function testFailureThreshold(): void
     {
-        $service = new CircuitBreaker('demo', 2, 60);
+        $storage = new ArrayStorage();
+        $service = new CircuitBreaker('demo', $storage, 2, 60);
 
         try {
             $service->call($this->failingClosure());
@@ -68,7 +72,8 @@ class CircuitBreakerTest extends TestCase
         ClockMock::register(CircuitBreaker::class);
         ClockMock::withClockMock(true);
 
-        $service = new CircuitBreaker('demo', 1, 10);
+        $storage = new ArrayStorage();
+        $service = new CircuitBreaker('demo', $storage, 1, 10);
 
         try {
             $service->call($this->failingClosure());
@@ -102,7 +107,8 @@ class CircuitBreakerTest extends TestCase
         ClockMock::register(CircuitBreaker::class);
         ClockMock::withClockMock(true);
 
-        $service = new CircuitBreaker('demo', 1, 10, 1.5);
+        $storage = new ArrayStorage();
+        $service = new CircuitBreaker('demo', $storage, 1, 10, 1.5);
 
         try {
             $service->call($this->failingClosure());
@@ -147,7 +153,8 @@ class CircuitBreakerTest extends TestCase
 
     public function testCircuitFunctions(): void
     {
-        $service = new CircuitBreaker('demo', 2, 10);
+        $storage = new ArrayStorage();
+        $service = new CircuitBreaker('demo', $storage, 2, 10);
 
         $this->assertTrue($service->isAvailable());
 

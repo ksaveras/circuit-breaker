@@ -1,11 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ksaveras\CircuitBreaker\Tests\Awareness;
 
 use Ksaveras\CircuitBreaker\Awareness\CircuitBreakerAwareTrait;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class CircuitBreakerAwareTraitTest.
+ */
 class CircuitBreakerAwareTraitTest extends TestCase
 {
     public function testTraitMethods(): void
