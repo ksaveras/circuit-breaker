@@ -6,7 +6,6 @@ use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
-use Symfony\Component\Cache\Adapter\NullAdapter;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
 class CircuitBreaker
@@ -73,22 +72,6 @@ class CircuitBreaker
         return $this->getCircuit()->getState();
     }
 
-    public function getStorage(): StorageInterface
-    {
-        if (null === $this->storage) {
-            $this->storage = new NullAdapter();
-        }
-
-        return $this->storage;
-    }
-
-    public function setStorage(StorageInterface $storage): self
-    {
-        $this->storage = $storage;
-
-        return $this;
-    }
-
     /**
      * @return mixed
      *
@@ -130,7 +113,7 @@ class CircuitBreaker
         $circuit = $this->getCircuit();
         $this->resetTimeout = $this->resetPeriod;
         $circuit->reset();
-        $this->storage->saveCircuit($circuit);
+        $this->saveCircuit($circuit);
 
         $this->setState(State::CLOSED);
     }
@@ -139,7 +122,7 @@ class CircuitBreaker
     {
         $circuit = $this->getCircuit();
         $circuit->increaseFailure();
-        $this->storage->saveCircuit($circuit);
+        $this->saveCircuit($circuit);
     }
 
     private function updateState(): void
@@ -171,7 +154,7 @@ class CircuitBreaker
         }
 
         $circuit->setState($state);
-        $this->storage->saveCircuit($circuit);
+        $this->saveCircuit($circuit);
     }
 
     private function getCircuit(): Circuit
@@ -183,18 +166,4 @@ class CircuitBreaker
     {
         $this->storage->saveCircuit($circuit);
     }
-
-//    private function loadCircuit(): void
-//    {
-//        $key = Circuit::cacheKey($this->name);
-//
-//        $this->circuit = $this->getStorage()->get(
-//            $key,
-//            static function () {
-//                return (new Circuit())
-//                    ->setState(State::CLOSED);
-//            },
-//            0
-//        );
-//    }
 }
