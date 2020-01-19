@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Ksaveras\CircuitBreaker\Storage;
 
 /**
@@ -18,9 +20,7 @@ abstract class AbstractStorage implements StorageInterface
     public static function validateKey(string $key): string
     {
         if (false !== strpbrk($key, self::RESERVED_CHARACTERS)) {
-            throw new \InvalidArgumentException(
-                sprintf('Storage key "%s" contains reserved characters %s', $key, static::RESERVED_CHARACTERS)
-            );
+            throw new \InvalidArgumentException(sprintf('Storage key "%s" contains reserved characters %s', $key, static::RESERVED_CHARACTERS));
         }
 
         return $key;

@@ -16,7 +16,8 @@ class CircuitBreakerAwareTraitTest extends TestCase
     public function testTraitMethods(): void
     {
         $circuitBreaker = $this->createMock(CircuitBreaker::class);
-        $service = $this->getObjectForTrait(CircuitBreakerAwareTrait::class);
+
+        $service = new MockObject();
 
         $service->setCircuitBreaker($circuitBreaker);
         $this->assertEquals($circuitBreaker, $service->getCircuitBreaker());
@@ -26,7 +27,12 @@ class CircuitBreakerAwareTraitTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
 
-        $service = $this->getObjectForTrait(CircuitBreakerAwareTrait::class);
+        $service = new MockObject();
         $service->getCircuitBreaker();
     }
+}
+
+class MockObject
+{
+    use CircuitBreakerAwareTrait;
 }

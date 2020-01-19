@@ -2,6 +2,9 @@
 
 namespace Ksaveras\CircuitBreaker;
 
+/**
+ * Class Circuit.
+ */
 class Circuit
 {
     /**
@@ -24,38 +27,22 @@ class Circuit
      */
     private $lastFailure;
 
-    /**
-     * Circuit constructor.
-     *
-     * @param string $name
-     */
     public function __construct(string $name)
     {
         $this->name = $name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getState()
+    public function getState(): string
     {
         return $this->state;
     }
 
-    /**
-     * @param mixed $state
-     *
-     * @return Circuit
-     */
-    public function setState($state)
+    public function setState(string $state): self
     {
         $this->state = $state;
 
