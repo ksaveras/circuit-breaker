@@ -11,9 +11,6 @@ use Ksaveras\CircuitBreaker\Storage\ArrayStorage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
-/**
- * Class CircuitBreakerTest.
- */
 class CircuitBreakerTest extends TestCase
 {
     public function testNewCircuitBreakerIsClosed(): void
