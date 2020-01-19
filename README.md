@@ -5,6 +5,8 @@
 ![PHPStan Level](https://img.shields.io/badge/PHPStan%20Level-7-brightgreen)
 ![GitHub](https://img.shields.io/github/license/ksaveras/circuit-breaker)
 
+More information: https://martinfowler.com/bliki/CircuitBreaker.html
+
 ## Installation
 
 ```
