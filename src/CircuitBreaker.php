@@ -3,7 +3,7 @@
 namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
-use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -33,7 +33,7 @@ class CircuitBreaker
     /**
      * @var int
      */
-    private $failureThreshold;
+    private $failureThreshold = 5;
 
     /**
      * @var float
@@ -45,12 +45,11 @@ class CircuitBreaker
      */
     private $ratio;
 
-    public function __construct(string $name, StorageInterface $storage, int $threshold = 5, float $resetPeriod = 60.0, float $ratio = 1.0)
+    public function __construct(string $name, StorageInterface $storage, float $resetPeriod = 60.0, float $ratio = 1.0)
     {
         $this->name = AbstractStorage::validateKey($name);
         $this->storage = $storage;
 
-        $this->failureThreshold = $threshold;
         $this->resetTimeout = $this->resetPeriod = $resetPeriod;
         $this->ratio = $ratio;
     }
@@ -72,6 +71,18 @@ class CircuitBreaker
         return $this->getCircuit()->getState();
     }
 
+    public function setFailureThreshold(int $failureThreshold): self
+    {
+        $this->failureThreshold = $failureThreshold;
+
+        return $this;
+    }
+
+    public function getCircuit(): Circuit
+    {
+        return $this->storage->getCircuit($this->name);
+    }
+
     /**
      * @return mixed
      *
@@ -79,11 +90,11 @@ class CircuitBreaker
      */
     public function call(\Closure $closure)
     {
-        $this->updateState();
+        $state = $this->updateState();
 
-        switch ($this->getState()) {
+        switch ($state) {
             case State::OPEN:
-                throw CircuitBreakerException::openCircuit();
+                throw new OpenCircuitException();
             case State::CLOSED:
             case State::HALF_OPEN:
                 try {
@@ -97,15 +108,15 @@ class CircuitBreaker
                     throw $exception;
                 }
             default:
-                throw new \LogicException('Unreachable code');
+                throw new \LogicException(sprintf('Unsupported Circuit state "%s"', $state));
         }
     }
 
     public function isAvailable(): bool
     {
-        $this->updateState();
+        $state = $this->updateState();
 
-        return \in_array($this->getState(), [State::CLOSED, State::HALF_OPEN], true);
+        return \in_array($state, [State::CLOSED, State::HALF_OPEN], true);
     }
 
     public function success(): void
@@ -125,7 +136,7 @@ class CircuitBreaker
         $this->saveCircuit($circuit);
     }
 
-    private function updateState(): void
+    private function updateState(): string
     {
         $state = State::CLOSED;
 
@@ -138,6 +149,8 @@ class CircuitBreaker
         }
 
         $this->setState($state);
+
+        return $state;
     }
 
     private function setState(string $state): void
@@ -155,11 +168,6 @@ class CircuitBreaker
 
         $circuit->setState($state);
         $this->saveCircuit($circuit);
-    }
-
-    private function getCircuit(): Circuit
-    {
-        return $this->storage->getCircuit($this->name);
     }
 
     private function saveCircuit(Circuit $circuit): void

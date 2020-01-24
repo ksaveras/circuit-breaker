@@ -36,7 +36,8 @@ class CircuitBreakerTest extends TestCase
     public function testFailureThreshold(): void
     {
         $storage = new ArrayStorage();
-        $service = new CircuitBreaker('demo', $storage, 2, 60);
+        $service = (new CircuitBreaker('demo', $storage, 60))
+            ->setFailureThreshold(2);
 
         try {
             $service->call($this->failingClosure());
@@ -70,7 +71,8 @@ class CircuitBreakerTest extends TestCase
         ClockMock::withClockMock(true);
 
         $storage = new ArrayStorage();
-        $service = new CircuitBreaker('demo', $storage, 1, 10);
+        $service = (new CircuitBreaker('demo', $storage, 10))
+            ->setFailureThreshold(1);
 
         try {
             $service->call($this->failingClosure());
@@ -105,7 +107,8 @@ class CircuitBreakerTest extends TestCase
         ClockMock::withClockMock(true);
 
         $storage = new ArrayStorage();
-        $service = new CircuitBreaker('demo', $storage, 1, 10, 1.5);
+        $service = (new CircuitBreaker('demo', $storage, 10, 1.5))
+            ->setFailureThreshold(1);
 
         try {
             $service->call($this->failingClosure());
@@ -151,7 +154,8 @@ class CircuitBreakerTest extends TestCase
     public function testCircuitFunctions(): void
     {
         $storage = new ArrayStorage();
-        $service = new CircuitBreaker('demo', $storage, 2, 10);
+        $service = (new CircuitBreaker('demo', $storage, 10))
+            ->setFailureThreshold(2);
 
         $this->assertTrue($service->isAvailable());
 
