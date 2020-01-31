@@ -27,6 +27,11 @@ class Circuit
      */
     private $lastFailure;
 
+    /**
+     * @var float|null
+     */
+    private $resetTimeout;
+
     public function __construct(string $name)
     {
         $this->name = $name;
@@ -65,9 +70,22 @@ class Circuit
         $this->lastFailure = microtime(true);
     }
 
+    public function getResetTimeout(): ?float
+    {
+        return $this->resetTimeout;
+    }
+
+    public function setResetTimeout(?float $resetTimeout): self
+    {
+        $this->resetTimeout = $resetTimeout;
+
+        return $this;
+    }
+
     public function reset(): void
     {
         $this->failureCount = 0;
         $this->lastFailure = null;
+        $this->resetTimeout = null;
     }
 }
