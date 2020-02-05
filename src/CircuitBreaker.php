@@ -26,7 +26,7 @@ class CircuitBreaker
     private $eventDispatcher;
 
     /**
-     * @var float
+     * @var int
      */
     private $resetTimeout;
 
@@ -36,7 +36,7 @@ class CircuitBreaker
     private $failureThreshold = 5;
 
     /**
-     * @var float
+     * @var int
      */
     private $resetPeriod;
 
@@ -45,7 +45,7 @@ class CircuitBreaker
      */
     private $ratio;
 
-    public function __construct(string $name, StorageInterface $storage, float $resetPeriod = 60.0, float $ratio = 1.0)
+    public function __construct(string $name, StorageInterface $storage, int $resetPeriod = 60, float $ratio = 1.0)
     {
         $this->name = AbstractStorage::validateKey($name);
         $this->storage = $storage;
@@ -121,19 +121,12 @@ class CircuitBreaker
 
     public function success(): void
     {
-        $circuit = $this->getCircuit();
-        $this->resetTimeout = $this->resetPeriod;
-        $circuit->reset();
-        $this->saveCircuit($circuit);
-
-        $this->setState(State::CLOSED);
+        $this->storage->resetCircuit($this->name);
     }
 
     public function failure(): void
     {
-        $circuit = $this->getCircuit();
-        $circuit->increaseFailure();
-        $this->saveCircuit($circuit);
+        $this->storage->increaseFailure($this->name);
     }
 
     private function updateState(): string
@@ -141,7 +134,7 @@ class CircuitBreaker
         $state = State::CLOSED;
 
         if ($this->getCircuit()->getFailureCount() >= $this->failureThreshold) {
-            if ((microtime(true) - $this->getCircuit()->getLastFailure()) > $this->resetTimeout) {
+            if ((time() - $this->getCircuit()->getLastFailure()) > $this->resetTimeout) {
                 $state = State::HALF_OPEN;
             } else {
                 $state = State::OPEN;
@@ -159,7 +152,7 @@ class CircuitBreaker
         $currentState = $circuit->getState();
 
         if (State::OPEN === $currentState && State::HALF_OPEN === $state) {
-            $this->resetTimeout *= $this->ratio;
+            $this->resetTimeout = (int) ceil($this->resetTimeout * $this->ratio);
         }
 
         if ($currentState !== $state && null !== $this->eventDispatcher) {

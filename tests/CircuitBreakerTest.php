@@ -7,7 +7,7 @@ namespace Ksaveras\CircuitBreaker\Tests;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\State;
-use Ksaveras\CircuitBreaker\Storage\ArrayStorage;
+use Ksaveras\CircuitBreaker\Storage\PhpArray;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
@@ -15,7 +15,7 @@ class CircuitBreakerTest extends TestCase
 {
     public function testNewCircuitBreakerIsClosed(): void
     {
-        $storage = new ArrayStorage();
+        $storage = new PhpArray();
 
         $service = new CircuitBreaker('demo', $storage);
 
@@ -24,7 +24,7 @@ class CircuitBreakerTest extends TestCase
 
     public function testCircuitBreaker(): void
     {
-        $storage = new ArrayStorage();
+        $storage = new PhpArray();
 
         $service = new CircuitBreaker('demo', $storage);
         $result = $service->call($this->successClosure('demo data'));
@@ -35,7 +35,7 @@ class CircuitBreakerTest extends TestCase
 
     public function testFailureThreshold(): void
     {
-        $storage = new ArrayStorage();
+        $storage = new PhpArray();
         $service = (new CircuitBreaker('demo', $storage, 60))
             ->setFailureThreshold(2);
 
@@ -70,7 +70,7 @@ class CircuitBreakerTest extends TestCase
         ClockMock::register(CircuitBreaker::class);
         ClockMock::withClockMock(true);
 
-        $storage = new ArrayStorage();
+        $storage = new PhpArray();
         $service = (new CircuitBreaker('demo', $storage, 10))
             ->setFailureThreshold(1);
 
@@ -106,7 +106,7 @@ class CircuitBreakerTest extends TestCase
         ClockMock::register(CircuitBreaker::class);
         ClockMock::withClockMock(true);
 
-        $storage = new ArrayStorage();
+        $storage = new PhpArray();
         $service = (new CircuitBreaker('demo', $storage, 10, 1.5))
             ->setFailureThreshold(1);
 
@@ -153,7 +153,7 @@ class CircuitBreakerTest extends TestCase
 
     public function testCircuitFunctions(): void
     {
-        $storage = new ArrayStorage();
+        $storage = new PhpArray();
         $service = (new CircuitBreaker('demo', $storage, 10))
             ->setFailureThreshold(2);
 

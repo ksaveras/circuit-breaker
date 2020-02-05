@@ -14,4 +14,8 @@ interface StorageInterface
     public function getCircuit(string $name): Circuit;
 
     public function saveCircuit(Circuit $circuit): void;
+
+    public function resetCircuit(string $name): void;
+
+    public function increaseFailure(string $name): void;
 }

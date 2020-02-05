@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
-use Ksaveras\CircuitBreaker\Storage\ArrayStorage;
+use Ksaveras\CircuitBreaker\Storage\PhpArray;
 use PHPUnit\Framework\TestCase;
 
-class ArrayStorageTest extends TestCase
+class PhpArrayTest extends TestCase
 {
     public function testStorage(): void
     {
-        $storage = new ArrayStorage();
+        $storage = new PhpArray();
 
         $circuit = $storage->getCircuit('demo1');
 

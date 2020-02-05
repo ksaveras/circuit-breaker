@@ -44,4 +44,9 @@ class PsrCache extends AbstractStorage
 
         $this->cache->save($item);
     }
+
+    public function resetCircuit(string $name): void
+    {
+        $this->cache->deleteItem(static::storageKey($name));
+    }
 }

@@ -23,18 +23,30 @@ class Circuit
     private $failureCount = 0;
 
     /**
-     * @var float|null
+     * @var int|null
      */
     private $lastFailure;
 
     /**
-     * @var float|null
+     * @var int|null
      */
     private $resetTimeout;
 
     public function __construct(string $name)
     {
         $this->name = $name;
+    }
+
+    public static function fromArray(array $data): self
+    {
+        $circuit = new self($data['name']);
+
+        $circuit->setState($data['state'] ?? State::CLOSED);
+        $circuit->setFailureCount($data['failureCount'] ?? 0);
+        $circuit->setLastFailure($data['lastFailure'] ?? null);
+        $circuit->setResetTimeout($data['resetTimeout'] ?? null);
+
+        return $circuit;
     }
 
     public function getName(): string
@@ -59,23 +71,37 @@ class Circuit
         return $this->failureCount;
     }
 
-    public function getLastFailure(): ?float
+    public function setFailureCount(int $failureCount): self
+    {
+        $this->failureCount = $failureCount;
+
+        return $this;
+    }
+
+    public function getLastFailure(): ?int
     {
         return $this->lastFailure;
+    }
+
+    public function setLastFailure(?int $lastFailure): self
+    {
+        $this->lastFailure = $lastFailure;
+
+        return $this;
     }
 
     public function increaseFailure(): void
     {
         ++$this->failureCount;
-        $this->lastFailure = microtime(true);
+        $this->lastFailure = time();
     }
 
-    public function getResetTimeout(): ?float
+    public function getResetTimeout(): ?int
     {
         return $this->resetTimeout;
     }
 
-    public function setResetTimeout(?float $resetTimeout): self
+    public function setResetTimeout(?int $resetTimeout): self
     {
         $this->resetTimeout = $resetTimeout;
 
@@ -87,5 +113,19 @@ class Circuit
         $this->failureCount = 0;
         $this->lastFailure = null;
         $this->resetTimeout = null;
+    }
+
+    /**
+     * @return array<string, string|int|null>
+     */
+    public function toArray(): array
+    {
+        return [
+            'name' => $this->name,
+            'state' => $this->state,
+            'failureCount' => $this->failureCount,
+            'lastFailure' => $this->lastFailure,
+            'resetTimeout' => $this->resetTimeout,
+        ];
     }
 }

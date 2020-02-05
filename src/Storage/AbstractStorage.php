@@ -25,4 +25,11 @@ abstract class AbstractStorage implements StorageInterface
 
         return $key;
     }
+
+    public function increaseFailure(string $name): void
+    {
+        $circuit = $this->getCircuit($name);
+        $circuit->increaseFailure();
+        $this->saveCircuit($circuit);
+    }
 }

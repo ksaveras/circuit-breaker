@@ -7,9 +7,9 @@ namespace Ksaveras\CircuitBreaker\Storage;
 use Ksaveras\CircuitBreaker\Circuit;
 
 /**
- * Class ArrayStorage.
+ * Class PhpArray.
  */
-class ArrayStorage extends AbstractStorage
+class PhpArray extends AbstractStorage
 {
     /**
      * @var Circuit[]|array
@@ -27,5 +27,10 @@ class ArrayStorage extends AbstractStorage
 
     public function saveCircuit(Circuit $circuit): void
     {
+    }
+
+    public function resetCircuit(string $name): void
+    {
+        unset($this->circuits[$name]);
     }
 }
