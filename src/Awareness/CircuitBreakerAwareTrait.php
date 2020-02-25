@@ -12,9 +12,6 @@ namespace Ksaveras\CircuitBreaker\Awareness;
 
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 
-/**
- * Trait CircuitBreakerAwareTrait.
- */
 trait CircuitBreakerAwareTrait
 {
     /**
