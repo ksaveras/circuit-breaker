@@ -53,6 +53,11 @@ class CircuitBreaker
      */
     private $ratio;
 
+    /**
+     * @var Circuit|null
+     */
+    private $circuit;
+
     public function __construct(string $name, StorageInterface $storage, int $resetPeriod = 60, float $ratio = 1.0)
     {
         $this->name = AbstractStorage::validateKey($name);
@@ -88,7 +93,11 @@ class CircuitBreaker
 
     public function getCircuit(): Circuit
     {
-        return $this->storage->getCircuit($this->name);
+        if (null === $this->circuit) {
+            $this->circuit = $this->storage->getCircuit($this->name);
+        }
+
+        return $this->circuit;
     }
 
     /**
@@ -129,12 +138,19 @@ class CircuitBreaker
 
     public function success(): void
     {
+        $state = $this->getCircuit()->getState();
+        if (State::CLOSED !== $state && null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(new StateChangeEvent($this, $state, State::CLOSED));
+        }
+
         $this->storage->resetCircuit($this->name);
+        $this->circuit = null;
     }
 
     public function failure(): void
     {
         $this->storage->increaseFailure($this->name);
+        $this->circuit = null;
     }
 
     private function updateState(): string
