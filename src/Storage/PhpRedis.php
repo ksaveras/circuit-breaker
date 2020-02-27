@@ -36,7 +36,7 @@ class PhpRedis extends AbstractStorage
         $data = $circuit->toArray();
         $name = static::storageKey($circuit->getName());
         foreach ($data as $key => $datum) {
-            $this->client->hSet($name, $key, $datum);
+            $this->client->hSet($name, $key, (string) $datum);
         }
 
         $this->client->expire($name, $circuit->getResetTimeout());

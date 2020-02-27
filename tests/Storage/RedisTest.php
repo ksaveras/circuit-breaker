@@ -11,7 +11,6 @@
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
-use Ksaveras\CircuitBreaker\Storage\PhpRedis;
 use Ksaveras\CircuitBreaker\Storage\Redis;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -20,7 +19,7 @@ use Predis\ClientInterface;
 class RedisTest extends TestCase
 {
     /**
-     * @var PhpRedis
+     * @var Redis
      */
     private $storage;
 
