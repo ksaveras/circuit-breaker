@@ -10,6 +10,7 @@
 
 namespace Ksaveras\CircuitBreaker\Tests\Awareness;
 
+use Ksaveras\CircuitBreaker\Awareness\CircuitBreakerAwareInterface;
 use Ksaveras\CircuitBreaker\Awareness\CircuitBreakerAwareTrait;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use PHPUnit\Framework\TestCase;
@@ -35,7 +36,7 @@ class CircuitBreakerAwareTraitTest extends TestCase
     }
 }
 
-class MockObject
+class MockObject implements CircuitBreakerAwareInterface
 {
     use CircuitBreakerAwareTrait;
 }
