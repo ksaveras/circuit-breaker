@@ -19,6 +19,7 @@
             <directory suffix=".php">src</directory>
             <exclude>
                 <directory>./vendor/</directory>
+                <directory suffix="Interface.php">src</directory>
             </exclude>
         </whitelist>
     </filter>
