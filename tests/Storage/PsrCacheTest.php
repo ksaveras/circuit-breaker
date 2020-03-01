@@ -10,6 +10,7 @@
 
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
+use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\PsrCache;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -32,5 +33,19 @@ class PsrCacheTest extends TestCase
         $circuit = $storage->getCircuit('demo');
 
         $this->assertEquals(1, $circuit->getFailureCount());
+    }
+
+    public function testResetCircuit(): void
+    {
+        $adapter = new ArrayAdapter();
+        $storage = new PsrCache($adapter);
+
+        $storage->getCircuit('demo');
+
+        $this->assertTrue($adapter->hasItem(AbstractStorage::storageKey('demo')));
+
+        $storage->resetCircuit('demo');
+
+        $this->assertFalse($adapter->hasItem(AbstractStorage::storageKey('demo')));
     }
 }
