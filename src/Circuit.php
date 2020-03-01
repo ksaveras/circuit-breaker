@@ -10,9 +10,8 @@
 
 namespace Ksaveras\CircuitBreaker;
 
-/**
- * Class Circuit.
- */
+use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+
 class Circuit
 {
     /**
@@ -47,6 +46,10 @@ class Circuit
 
     public static function fromArray(array $data): self
     {
+        if (!isset($data['name'])) {
+            throw new CircuitBreakerException('Missing required data field "name"');
+        }
+
         $circuit = new self($data['name']);
 
         $circuit->setState($data['state'] ?? State::CLOSED);
