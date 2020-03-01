@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
 use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
-use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Psr\EventDispatcher\EventDispatcherInterface;
 
 class CircuitBreaker
 {

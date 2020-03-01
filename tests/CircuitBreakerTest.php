@@ -11,60 +11,96 @@
 namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreaker;
+use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\PhpArray;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\EventDispatcher\EventDispatcherInterface;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
 class CircuitBreakerTest extends TestCase
 {
+    /**
+     * @var PhpArray
+     */
+    private $storage;
+
+    /**
+     * @var EventDispatcherInterface&MockObject
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var CircuitBreaker
+     */
+    private $service;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->storage = new PhpArray();
+        $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+
+        $this->service = new CircuitBreaker('demo', $this->storage);
+        $this->service->setEventDispatcher($this->eventDispatcher);
+    }
+
     public function testNewCircuitBreakerIsClosed(): void
     {
-        $storage = new PhpArray();
-
-        $service = new CircuitBreaker('demo', $storage);
-
-        $this->assertEquals(State::CLOSED, $service->getState());
+        $this->assertEquals(State::CLOSED, $this->service->getState());
     }
 
     public function testCircuitBreaker(): void
     {
-        $storage = new PhpArray();
-
-        $service = new CircuitBreaker('demo', $storage);
-        $result = $service->call($this->successClosure('demo data'));
+        $result = $this->service->call($this->successClosure('demo data'));
 
         $this->assertEquals('demo data', $result);
-        $this->assertEquals(State::CLOSED, $service->getState());
+        $this->assertEquals(State::CLOSED, $this->service->getState());
     }
 
     public function testFailureThreshold(): void
     {
-        $storage = new PhpArray();
-        $service = (new CircuitBreaker('demo', $storage, 60))
-            ->setFailureThreshold(2);
+        $this->service->setFailureThreshold(2);
 
         try {
-            $service->call($this->failingClosure());
+            $this->service->call($this->failingClosure());
         } catch (\Exception $exception) {
             $this->assertInstanceOf(\RuntimeException::class, $exception);
         }
-        $this->assertEquals(State::CLOSED, $service->getState());
+        $this->assertEquals(State::CLOSED, $this->service->getState());
 
         try {
-            $service->call($this->failingClosure());
+            $this->service->call($this->failingClosure());
         } catch (\Exception $exception) {
             $this->assertInstanceOf(\RuntimeException::class, $exception);
         }
-        $this->assertEquals(State::CLOSED, $service->getState());
+        $this->assertEquals(State::CLOSED, $this->service->getState());
+
+        $this->eventDispatcher->expects($this->once())
+            ->method('dispatch')
+            ->with(
+                $this->callback(
+                    function ($event) {
+                        /* @var StateChangeEvent $event */
+                        $this->assertInstanceOf(StateChangeEvent::class, $event);
+                        $this->assertEquals('closed', $event->getOldState());
+                        $this->assertEquals('open', $event->getNewState());
+                        $this->assertEquals('demo', $event->getName());
+
+                        return true;
+                    }
+                )
+            );
 
         try {
-            $service->call($this->failingClosure());
+            $this->service->call($this->failingClosure());
         } catch (\Exception $exception) {
             $this->assertInstanceOf(CircuitBreakerException::class, $exception);
         }
-        $this->assertEquals(State::OPEN, $service->getState());
+        $this->assertEquals(State::OPEN, $this->service->getState());
     }
 
     /**
