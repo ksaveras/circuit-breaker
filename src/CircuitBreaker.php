@@ -139,11 +139,12 @@ class CircuitBreaker
     public function success(): void
     {
         $state = $this->getCircuit()->getState();
+        $this->storage->resetCircuit($this->name);
+
         if (State::CLOSED !== $state && null !== $this->eventDispatcher) {
             $this->eventDispatcher->dispatch(new StateChangeEvent($this, $state, State::CLOSED));
         }
 
-        $this->storage->resetCircuit($this->name);
         $this->circuit = null;
     }
 
@@ -179,11 +180,12 @@ class CircuitBreaker
             $this->resetTimeout = (int) ceil($this->resetTimeout * $this->ratio);
         }
 
+        $circuit->setState($state);
+
         if ($currentState !== $state && null !== $this->eventDispatcher) {
             $this->eventDispatcher->dispatch(new StateChangeEvent($this, $currentState, $state));
         }
 
-        $circuit->setState($state);
         $this->saveCircuit($circuit);
     }
 

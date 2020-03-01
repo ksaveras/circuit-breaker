@@ -89,6 +89,7 @@ class CircuitBreakerTest extends TestCase
                         $this->assertEquals('closed', $event->getOldState());
                         $this->assertEquals('open', $event->getNewState());
                         $this->assertEquals('demo', $event->getName());
+                        $this->assertEquals($event->getNewState(), $event->getCircuitBreaker()->getState());
 
                         return true;
                     }
