@@ -2,7 +2,7 @@
     "name": "ksaveras/circuit-breaker",
     "type": "library",
     "description": "Circuit Breaker library",
-    "keywords": ["circuit-breaker"],
+    "keywords": ["circuit breaker", "graceful", "error handling", "fault tolerance", "microservices"],
     "license": "MIT",
     "authors": [
         {
@@ -12,9 +12,8 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "symfony/cache": "^4.0|^5.0",
-        "symfony/cache-contracts": "^2.0",
-        "symfony/event-dispatcher-contracts": "^2.0"
+        "psr/event-dispatcher": "^1.0",
+        "symfony/cache": "^4.0|^5.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16",
