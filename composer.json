@@ -12,8 +12,7 @@
     ],
     "require": {
         "php": "^7.2.5",
-        "psr/event-dispatcher": "^1.0",
-        "symfony/cache": "^4.0|^5.0"
+        "psr/event-dispatcher": "^1.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^2.16",
@@ -21,6 +20,7 @@
         "phpstan/phpstan-phpunit": "^0.12.6",
         "phpunit/phpunit": "^8.5",
         "predis/predis": "^1.1",
+        "symfony/cache": "^4.0|^5.0",
         "symfony/phpunit-bridge": "^4.0|^5.0"
     },
     "autoload": {
@@ -36,9 +36,9 @@
     "suggest": {
         "ext-apcu": "Allows storing circuit breaker data in APCu",
         "ext-phpiredis": "Allows faster serialization and deserialization of the Redis protocol",
-        "predis/predis": "",
-        "symfony/event-dispatcher": "",
-        "symfony/cache": ""
+        "predis/predis": "Allows storing circuit breaker data in Redis without PHP extension",
+        "symfony/event-dispatcher": "Allows firing events on circuit state change",
+        "symfony/cache": "Allows storing circuit breaker data using Symfony Cache Component"
     },
     "scripts": {
         "phpcsfix": "@php ./vendor/bin/php-cs-fixer fix",
