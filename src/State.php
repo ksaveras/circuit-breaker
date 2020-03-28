@@ -11,8 +11,6 @@
 namespace Ksaveras\CircuitBreaker;
 
 /**
- * Class State.
- *
  * @codeCoverageIgnore
  */
 final class State

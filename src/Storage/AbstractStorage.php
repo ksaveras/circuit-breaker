@@ -10,9 +10,6 @@
 
 namespace Ksaveras\CircuitBreaker\Storage;
 
-/**
- * Class AbstractStorage.
- */
 abstract class AbstractStorage implements StorageInterface
 {
     public const STORAGE_PREFIX = 'CircuitBreaker';
@@ -26,7 +23,9 @@ abstract class AbstractStorage implements StorageInterface
     public static function validateKey(string $key): string
     {
         if (false !== strpbrk($key, self::RESERVED_CHARACTERS)) {
-            throw new \InvalidArgumentException(sprintf('Storage key "%s" contains reserved characters %s', $key, static::RESERVED_CHARACTERS));
+            throw new \InvalidArgumentException(
+                sprintf('Storage key "%s" contains reserved characters %s', $key, static::RESERVED_CHARACTERS)
+            );
         }
 
         return $key;

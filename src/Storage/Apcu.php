@@ -12,9 +12,6 @@ namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-/**
- * Class Apcu.
- */
 class Apcu extends AbstractStorage
 {
     public function getCircuit(string $name): Circuit
