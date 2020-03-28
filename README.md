@@ -8,22 +8,65 @@
 More information: https://martinfowler.com/bliki/CircuitBreaker.html
 
 ## Installation
-
 ```
 composer require ksaveras/circuit-breaker
 ```
 
 ## Use
 
+Simple circuit check
+```php
+use \Ksaveras\CircuitBreaker\Storage\Apcu;
+use \Ksaveras\CircuitBreaker\CircuitBreaker;
+
+$storage = new Apcu();
+$period = 120;
+
+$circuitBreaker = new CircuitBreaker('service-api', $storage, $period);
+$circuitBreaker->setFailureThreshold(3);
+
+if ($circuitBreaker->isAvailable()) {
+    try {
+        // call 3rd party service api
+        $circuitBreaker->success();
+    } catch (\Exception $exception) {
+        $circuitBreaker->failure();
+    }   
+}
+```
+
+Use callback
+```php
+use \Ksaveras\CircuitBreaker\Storage\Apcu;
+use \Ksaveras\CircuitBreaker\CircuitBreaker;
+use \Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
+
+$storage = new Apcu();
+$period = 120;
+
+$circuitBreaker = new CircuitBreaker('service-api', $storage, $period);
+$circuitBreaker->setFailureThreshold(3);
+
+try {
+    $circuitBreaker->call(
+        function () {
+            $this->callApi();
+        }
+    );
+} catch (OpenCircuitException $exception) {
+    // Open circuit
+} catch (\Exception $exception) {
+    // 3rd party exception
+}
+```
 
 ## Tests
-
 ```
 composer test
 ```
 
 ## Code quality
-
 ```
-composer phpstan && composer phpcsfix
+composer phpstan
+composer phpcsfix
 ```
