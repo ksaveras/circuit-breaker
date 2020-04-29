@@ -13,9 +13,6 @@ namespace Ksaveras\CircuitBreaker\Storage;
 use Ksaveras\CircuitBreaker\Circuit;
 use Psr\Cache\CacheItemPoolInterface;
 
-/**
- * Class PsrCache.
- */
 class PsrCache extends AbstractStorage
 {
     /**
