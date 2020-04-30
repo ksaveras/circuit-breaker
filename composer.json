@@ -44,7 +44,7 @@
         "phpcsfix": "@php ./vendor/bin/php-cs-fixer fix",
         "phpcscheck": "@php ./vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format=udiff",
         "phpstan": "@php ./vendor/bin/phpstan analyse src tests",
-        "test": "@php ./vendor/bin/phpunit"
+        "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit"
     },
     "config": {
         "sort-packages": true,
