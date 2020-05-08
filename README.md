@@ -18,11 +18,12 @@ Simple circuit check
 ```php
 use \Ksaveras\CircuitBreaker\Storage\Apcu;
 use \Ksaveras\CircuitBreaker\CircuitBreaker;
+use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 
 $storage = new Apcu();
-$period = 120;
+$period = 300;
 
-$circuitBreaker = new CircuitBreaker('service-api', $storage, $period);
+$circuitBreaker = new CircuitBreaker('service-api', $storage, new CircuitFactory($period));
 $circuitBreaker->setFailureThreshold(3);
 
 if ($circuitBreaker->isAvailable()) {
@@ -40,11 +41,12 @@ Use callback
 use \Ksaveras\CircuitBreaker\Storage\Apcu;
 use \Ksaveras\CircuitBreaker\CircuitBreaker;
 use \Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
+use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 
 $storage = new Apcu();
-$period = 120;
+$period = 300;
 
-$circuitBreaker = new CircuitBreaker('service-api', $storage, $period);
+$circuitBreaker = new CircuitBreaker('service-api', $storage, new CircuitFactory($period));
 $circuitBreaker->setFailureThreshold(3);
 
 try {
