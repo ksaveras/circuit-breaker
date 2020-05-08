@@ -13,7 +13,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 interface StorageInterface
 {
-    public function getCircuit(string $name): Circuit;
+    public function getCircuit(string $name): ?Circuit;
 
     public function saveCircuit(Circuit $circuit): void;
 

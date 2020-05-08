@@ -11,6 +11,7 @@ namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
 use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
+use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 use Psr\EventDispatcher\EventDispatcherInterface;
@@ -35,35 +36,23 @@ class CircuitBreaker
     /**
      * @var int
      */
-    private $resetTimeout;
-
-    /**
-     * @var int
-     */
     private $failureThreshold = 5;
-
-    /**
-     * @var int
-     */
-    private $resetPeriod;
-
-    /**
-     * @var float
-     */
-    private $ratio;
 
     /**
      * @var Circuit|null
      */
     private $circuit;
 
-    public function __construct(string $name, StorageInterface $storage, int $resetPeriod = 60, float $ratio = 1.0)
+    /**
+     * @var CircuitFactory
+     */
+    private $factory;
+
+    public function __construct(string $name, StorageInterface $storage, CircuitFactory $factory)
     {
         $this->name = AbstractStorage::validateKey($name);
         $this->storage = $storage;
-
-        $this->resetTimeout = $this->resetPeriod = $resetPeriod;
-        $this->ratio = $ratio;
+        $this->factory = $factory;
     }
 
     public function setEventDispatcher(EventDispatcherInterface $eventDispatcher): self
@@ -93,7 +82,10 @@ class CircuitBreaker
     public function getCircuit(): Circuit
     {
         if (null === $this->circuit) {
-            $this->circuit = $this->storage->getCircuit($this->name);
+            if (null === $circuit = $this->storage->getCircuit($this->name)) {
+                $circuit = $this->factory->create($this->name);
+            }
+            $this->circuit = $circuit;
         }
 
         return $this->circuit;
@@ -149,7 +141,9 @@ class CircuitBreaker
 
     public function failure(): void
     {
-        $this->storage->increaseFailure($this->name);
+        $circuit = $this->getCircuit();
+        $circuit->increaseFailure();
+        $this->saveCircuit($circuit);
         $this->circuit = null;
     }
 
@@ -158,7 +152,7 @@ class CircuitBreaker
         $state = State::CLOSED;
 
         if ($this->getCircuit()->getFailureCount() >= $this->failureThreshold) {
-            if ((time() - $this->getCircuit()->getLastFailure()) > $this->resetTimeout) {
+            if ((time() - $this->getCircuit()->getLastFailure()) > $this->getCircuit()->getResetTimeout()) {
                 $state = State::HALF_OPEN;
             } else {
                 $state = State::OPEN;
@@ -173,16 +167,18 @@ class CircuitBreaker
     private function setState(string $state): void
     {
         $circuit = $this->getCircuit();
-        $currentState = $circuit->getState();
+        $oldState = $circuit->getState();
 
-        if (State::OPEN === $currentState && State::HALF_OPEN === $state) {
-            $this->resetTimeout = (int) ceil($this->resetTimeout * $this->ratio);
+        if (State::OPEN === $oldState && State::HALF_OPEN === $state) {
+            $retries = $circuit->getFailureCount() - $this->failureThreshold;
+            $timeout = (int) 2 ** $retries + $circuit->getResetTimeout();
+            $circuit->setResetTimeout($timeout);
         }
 
         $circuit->setState($state);
 
-        if ($currentState !== $state && null !== $this->eventDispatcher) {
-            $this->eventDispatcher->dispatch(new StateChangeEvent($this, $currentState, $state));
+        if ($oldState !== $state && null !== $this->eventDispatcher) {
+            $this->eventDispatcher->dispatch(new StateChangeEvent($this, $oldState, $state));
         }
 
         $this->saveCircuit($circuit);

@@ -24,14 +24,13 @@ class PsrCache extends AbstractStorage
         $this->cache = $cache;
     }
 
-    public function getCircuit(string $name): Circuit
+    public function getCircuit(string $name): ?Circuit
     {
         $storageKey = static::storageKey($name);
 
         $item = $this->cache->getItem($storageKey);
         if (!$item->isHit()) {
-            $item->set(new Circuit($name));
-            $this->cache->save($item);
+            return null;
         }
 
         return $item->get();

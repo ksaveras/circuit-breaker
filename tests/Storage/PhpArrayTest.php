@@ -9,6 +9,7 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
+use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Storage\PhpArray;
 use PHPUnit\Framework\TestCase;
 
@@ -17,6 +18,8 @@ class PhpArrayTest extends TestCase
     public function testStorage(): void
     {
         $storage = new PhpArray();
+
+        $storage->saveCircuit(new Circuit('demo1'));
 
         $circuit = $storage->getCircuit('demo1');
 

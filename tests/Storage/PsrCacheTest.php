@@ -9,6 +9,7 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
+use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\PsrCache;
 use PHPUnit\Framework\TestCase;
@@ -19,8 +20,9 @@ class PsrCacheTest extends TestCase
     public function testStorage(): void
     {
         $adapter = new ArrayAdapter();
-
         $storage = new PsrCache($adapter);
+
+        $storage->saveCircuit(new Circuit('demo'));
 
         $circuit = $storage->getCircuit('demo');
 
@@ -39,7 +41,7 @@ class PsrCacheTest extends TestCase
         $adapter = new ArrayAdapter();
         $storage = new PsrCache($adapter);
 
-        $storage->getCircuit('demo');
+        $storage->saveCircuit(new Circuit('demo'));
 
         $this->assertTrue($adapter->hasItem(AbstractStorage::storageKey('demo')));
 

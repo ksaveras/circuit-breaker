@@ -11,7 +11,7 @@ namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 
-class Circuit
+final class Circuit
 {
     /**
      * @var string
@@ -34,9 +34,9 @@ class Circuit
     private $lastFailure;
 
     /**
-     * @var int|null
+     * @var int
      */
-    private $resetTimeout;
+    private $resetTimeout = 60;
 
     public function __construct(string $name)
     {
@@ -54,7 +54,10 @@ class Circuit
         $circuit->setState($data['state'] ?? State::CLOSED);
         $circuit->setFailureCount($data['failureCount'] ?? 0);
         $circuit->setLastFailure($data['lastFailure'] ?? null);
-        $circuit->setResetTimeout($data['resetTimeout'] ?? null);
+
+        if (isset($data['resetTimeout'])) {
+            $circuit->setResetTimeout($data['resetTimeout']);
+        }
 
         return $circuit;
     }
@@ -106,12 +109,12 @@ class Circuit
         $this->lastFailure = time();
     }
 
-    public function getResetTimeout(): ?int
+    public function getResetTimeout(): int
     {
         return $this->resetTimeout;
     }
 
-    public function setResetTimeout(?int $resetTimeout): self
+    public function setResetTimeout(int $resetTimeout): self
     {
         $this->resetTimeout = $resetTimeout;
 
@@ -122,7 +125,6 @@ class Circuit
     {
         $this->failureCount = 0;
         $this->lastFailure = null;
-        $this->resetTimeout = null;
     }
 
     /**

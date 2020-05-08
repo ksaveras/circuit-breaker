@@ -24,9 +24,12 @@ class Redis extends AbstractStorage
         $this->client = $client;
     }
 
-    public function getCircuit(string $name): Circuit
+    public function getCircuit(string $name): ?Circuit
     {
         $data = $this->client->hgetall(static::storageKey($name));
+        if (empty($data)) {
+            return null;
+        }
 
         return Circuit::fromArray($data);
     }

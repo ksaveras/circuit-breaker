@@ -65,9 +65,6 @@ class ApcuTest extends TestCase
         $this->storage->resetCircuit('demo');
 
         $circuit = $this->storage->getCircuit('demo');
-        $this->assertEquals(State::CLOSED, $circuit->getState());
-        $this->assertEquals(0, $circuit->getFailureCount());
-        $this->assertNull($circuit->getLastFailure());
-        $this->assertNull($circuit->getResetTimeout());
+        $this->assertNull($circuit);
     }
 }

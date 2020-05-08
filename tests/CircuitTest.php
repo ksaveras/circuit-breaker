@@ -36,7 +36,7 @@ class CircuitTest extends TestCase
                 'state' => 'closed',
                 'failureCount' => 0,
                 'lastFailure' => null,
-                'resetTimeout' => null,
+                'resetTimeout' => 60,
             ],
         ];
 
@@ -83,6 +83,6 @@ class CircuitTest extends TestCase
 
         $this->assertEquals(0, $circuit->getFailureCount());
         $this->assertNull($circuit->getLastFailure());
-        $this->assertNull($circuit->getResetTimeout());
+        $this->assertEquals(120, $circuit->getResetTimeout());
     }
 }

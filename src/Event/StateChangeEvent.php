@@ -12,7 +12,7 @@ namespace Ksaveras\CircuitBreaker\Event;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Symfony\Contracts\EventDispatcher\Event;
 
-class StateChangeEvent extends Event
+final class StateChangeEvent extends Event
 {
     /**
      * @var CircuitBreaker

@@ -12,6 +12,7 @@ namespace Ksaveras\CircuitBreaker\Tests;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Event\StateChangeEvent;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\PhpArray;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -21,11 +22,6 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 
 class CircuitBreakerTest extends TestCase
 {
-    /**
-     * @var PhpArray
-     */
-    private $storage;
-
     /**
      * @var EventDispatcherInterface&MockObject
      */
@@ -40,10 +36,9 @@ class CircuitBreakerTest extends TestCase
     {
         parent::setUp();
 
-        $this->storage = new PhpArray();
         $this->eventDispatcher = $this->createMock(EventDispatcherInterface::class);
 
-        $this->service = new CircuitBreaker('demo', $this->storage);
+        $this->service = new CircuitBreaker('demo', new PhpArray(), new CircuitFactory());
         $this->service->setEventDispatcher($this->eventDispatcher);
     }
 
@@ -113,7 +108,7 @@ class CircuitBreakerTest extends TestCase
         ClockMock::withClockMock(true);
 
         $storage = new PhpArray();
-        $service = (new CircuitBreaker('demo', $storage, 10))
+        $service = (new CircuitBreaker('demo', $storage, new CircuitFactory(10)))
             ->setFailureThreshold(1);
 
         try {
@@ -149,7 +144,7 @@ class CircuitBreakerTest extends TestCase
         ClockMock::withClockMock(true);
 
         $storage = new PhpArray();
-        $service = (new CircuitBreaker('demo', $storage, 10, 1.5))
+        $service = (new CircuitBreaker('demo', $storage, new CircuitFactory(10)))
             ->setFailureThreshold(1);
 
         try {
@@ -196,7 +191,7 @@ class CircuitBreakerTest extends TestCase
     public function testCircuitFunctions(): void
     {
         $storage = new PhpArray();
-        $service = (new CircuitBreaker('demo', $storage, 10))
+        $service = (new CircuitBreaker('demo', $storage, new CircuitFactory(10)))
             ->setFailureThreshold(2);
 
         $this->assertTrue($service->isAvailable());

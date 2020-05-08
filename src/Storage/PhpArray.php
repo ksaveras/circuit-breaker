@@ -18,10 +18,10 @@ class PhpArray extends AbstractStorage
      */
     private $circuits = [];
 
-    public function getCircuit(string $name): Circuit
+    public function getCircuit(string $name): ?Circuit
     {
         if (!isset($this->circuits[$name])) {
-            $this->circuits[$name] = new Circuit($name);
+            return null;
         }
 
         return $this->circuits[$name];
@@ -29,6 +29,7 @@ class PhpArray extends AbstractStorage
 
     public function saveCircuit(Circuit $circuit): void
     {
+        $this->circuits[$circuit->getName()] = $circuit;
     }
 
     public function resetCircuit(string $name): void

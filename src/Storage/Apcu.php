@@ -13,14 +13,14 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 class Apcu extends AbstractStorage
 {
-    public function getCircuit(string $name): Circuit
+    public function getCircuit(string $name): ?Circuit
     {
         $data = apcu_fetch(static::storageKey($name));
-        if (false !== $data) {
-            return Circuit::fromArray($data);
+        if (false === $data) {
+            return null;
         }
 
-        return new Circuit($name);
+        return Circuit::fromArray($data);
     }
 
     public function saveCircuit(Circuit $circuit): void
