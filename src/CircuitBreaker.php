@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 /*
- * This file is part of ksaveras/circuit-breaker-bundle.
+ * This file is part of ksaveras/circuit-breaker.
  *
  * (c) Ksaveras Sakys <xawiers@gmail.com>
  *
