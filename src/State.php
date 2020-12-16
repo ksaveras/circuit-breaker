@@ -21,4 +21,8 @@ final class State
     private function __construct()
     {
     }
+
+    private function __clone()
+    {
+    }
 }
