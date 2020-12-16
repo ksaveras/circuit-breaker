@@ -22,7 +22,7 @@ class CircuitTest extends TestCase
     {
         $circuit = Circuit::fromArray($data);
 
-        $this->assertEquals($expected, $circuit->toArray());
+        self::assertEquals($expected, $circuit->toArray());
     }
 
     public function circuitDataProvider(): \Generator

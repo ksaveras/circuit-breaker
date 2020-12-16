@@ -20,6 +20,7 @@ class CircuitFactoryTest extends TestCase
 
         $circuit = $factory->create('demo');
 
-        $this->assertEquals(600, $circuit->getResetTimeout());
+        self::assertEquals('demo', $circuit->getName());
+        self::assertEquals(600, $circuit->getResetTimeout());
     }
 }

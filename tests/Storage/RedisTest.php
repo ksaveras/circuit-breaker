@@ -45,14 +45,14 @@ class RedisTest extends TestCase
             'resetTimeout' => 600,
         ];
 
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('__call')
             ->with('hgetall', ['CircuitBreaker|myApi'])
             ->willReturn($circuitData);
 
         $circuit = $this->storage->getCircuit('myApi');
 
-        $this->assertEquals($circuitData, $circuit->toArray());
+        self::assertEquals($circuitData, $circuit->toArray());
     }
 
     public function testSaveCircuit(): void
@@ -82,7 +82,7 @@ class RedisTest extends TestCase
 
     public function testResetCircuit(): void
     {
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('__call')
             ->with('del', [['CircuitBreaker|myApi']]);
 

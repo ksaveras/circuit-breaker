@@ -44,14 +44,14 @@ class PhpRedisTest extends TestCase
             'resetTimeout' => 600,
         ];
 
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('hGetAll')
             ->with('CircuitBreaker|myApi')
             ->willReturn($circuitData);
 
         $circuit = $this->storage->getCircuit('myApi');
 
-        $this->assertEquals($circuitData, $circuit->toArray());
+        self::assertEquals($circuitData, $circuit->toArray());
     }
 
     public function testSaveCircuit(): void
@@ -74,7 +74,7 @@ class PhpRedisTest extends TestCase
                 ['CircuitBreaker|myApi', 'resetTimeout', 600]
             );
 
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('expire')
             ->with('CircuitBreaker|myApi', 600);
 
@@ -83,7 +83,7 @@ class PhpRedisTest extends TestCase
 
     public function testResetCircuit(): void
     {
-        $this->client->expects($this->once())
+        $this->client->expects(self::once())
             ->method('del')
             ->with('CircuitBreaker|myApi');
 

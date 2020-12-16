@@ -23,7 +23,7 @@ class CircuitBreakerAwareTraitTest extends TestCase
         $service = new MockObject();
 
         $service->setCircuitBreaker($circuitBreaker);
-        $this->assertEquals($circuitBreaker, $service->getCircuitBreaker());
+        self::assertEquals($circuitBreaker, $service->getCircuitBreaker());
     }
 
     public function testNullReturn(): void

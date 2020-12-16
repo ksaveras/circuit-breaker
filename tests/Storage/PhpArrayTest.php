@@ -23,13 +23,13 @@ class PhpArrayTest extends TestCase
 
         $circuit = $storage->getCircuit('demo1');
 
-        $this->assertEquals(0, $circuit->getFailureCount());
+        self::assertEquals(0, $circuit->getFailureCount());
 
         $circuit->increaseFailure();
         $storage->saveCircuit($circuit);
 
         $circuit = $storage->getCircuit('demo1');
 
-        $this->assertEquals(1, $circuit->getFailureCount());
+        self::assertEquals(1, $circuit->getFailureCount());
     }
 }
