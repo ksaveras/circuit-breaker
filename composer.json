@@ -11,7 +11,7 @@
         }
     ],
     "require": {
-        "php": "^7.2.5",
+        "php": "^7.3 || ^8.0",
         "psr/event-dispatcher": "^1.0"
     },
     "require-dev": {
@@ -49,7 +49,7 @@
     "config": {
         "sort-packages": true,
         "platform": {
-            "php": "7.2.5"
+            "php": "7.3.25"
         }
     }
 }
