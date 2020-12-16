@@ -28,6 +28,7 @@ return PhpCsFixer\Config::create()
         'declare_strict_types' => true,
         'fopen_flags' => true,
         'header_comment' => ['header' => $header, 'separate' => 'none'],
+        'linebreak_after_opening_tag' => false,
         'method_chaining_indentation' => true,
         'no_useless_else' => true,
         'no_superfluous_phpdoc_tags' => ['allow_mixed' => true],
