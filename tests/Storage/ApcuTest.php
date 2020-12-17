@@ -9,9 +9,9 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
-use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\Apcu;
+use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 
 class ApcuTest extends TestCase
@@ -31,40 +31,38 @@ class ApcuTest extends TestCase
     public function testSaveCircuit(): void
     {
         if (!\function_exists('apcu_store')) {
-            $this->markTestSkipped();
+            self::markTestSkipped('Missing apcu extension');
         }
 
-        $circuit = (new Circuit('demo'))
-            ->setState(State::OPEN)
-            ->setFailureCount(10)
-            ->setLastFailure(1588146000)
-            ->setResetTimeout(1588166000);
+        $circuit = CircuitBuilder::builder()
+            ->withName('demo')
+            ->withFailureCount(10)
+            ->build();
 
         $this->storage->saveCircuit($circuit);
 
-        $circuit = $this->storage->getCircuit('demo');
-        $this->assertEquals(State::OPEN, $circuit->getState());
-        $this->assertEquals(10, $circuit->getFailureCount());
-        $this->assertEquals(1588146000, $circuit->getLastFailure());
-        $this->assertEquals(1588166000, $circuit->getResetTimeout());
+        $circuitB = $this->storage->getCircuit('demo');
+        self::assertEquals(State::OPEN, $circuitB->getState());
+        self::assertEquals(10, $circuitB->getFailureCount());
+        self::assertEquals($circuit->getLastFailure(), $circuitB->getLastFailure());
+        self::assertEquals($circuit->getResetTimeout(), $circuitB->getResetTimeout());
     }
 
     public function testResetCircuit(): void
     {
         if (!\function_exists('apcu_store')) {
-            $this->markTestSkipped();
+            self::markTestSkipped('Missing apcu extension');
         }
 
-        $circuit = (new Circuit('demo'))
-            ->setState(State::OPEN)
-            ->setFailureCount(10)
-            ->setLastFailure(1588146000)
-            ->setResetTimeout(1588166000);
+        $circuit = CircuitBuilder::builder()
+            ->withName('demo')
+            ->withFailureCount(10)
+            ->build();
 
         $this->storage->saveCircuit($circuit);
         $this->storage->resetCircuit('demo');
 
         $circuit = $this->storage->getCircuit('demo');
-        $this->assertNull($circuit);
+        self::assertNull($circuit);
     }
 }

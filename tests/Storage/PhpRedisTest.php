@@ -9,8 +9,8 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
-use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Storage\PhpRedis;
+use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -34,6 +34,18 @@ class PhpRedisTest extends TestCase
         $this->storage = new PhpRedis($this->client);
     }
 
+    public function testReturnsNullIfNotFound(): void
+    {
+        $this->client->expects(self::once())
+            ->method('hGetAll')
+            ->with('CircuitBreaker|myApi')
+            ->willReturn(null);
+
+        $circuit = $this->storage->getCircuit('myApi');
+
+        self::assertNull($circuit);
+    }
+
     public function testGetCircuit(): void
     {
         $circuitData = [
@@ -42,6 +54,7 @@ class PhpRedisTest extends TestCase
             'failureCount' => 10,
             'lastFailure' => time(),
             'resetTimeout' => 600,
+            'failureThreshold' => 5,
         ];
 
         $this->client->expects(self::once())
@@ -58,25 +71,22 @@ class PhpRedisTest extends TestCase
     {
         $now = time();
 
-        $circuit = new Circuit('myApi');
-        $circuit->setState('open')
-            ->setResetTimeout(600)
-            ->setFailureCount(5)
-            ->setLastFailure($now);
+        $circuit = CircuitBuilder::builder()->build();
 
-        $this->client->expects($this->exactly(5))
+        $this->client->expects(self::exactly(6))
             ->method('hSet')
             ->withConsecutive(
-                ['CircuitBreaker|myApi', 'name', 'myApi'],
-                ['CircuitBreaker|myApi', 'state', 'open'],
-                ['CircuitBreaker|myApi', 'failureCount', 5],
-                ['CircuitBreaker|myApi', 'lastFailure', $now],
-                ['CircuitBreaker|myApi', 'resetTimeout', 600]
+                ['CircuitBreaker|demo', 'name', 'demo'],
+                ['CircuitBreaker|demo', 'state', 'open'],
+                ['CircuitBreaker|demo', 'failureCount', 3],
+                ['CircuitBreaker|demo', 'failureThreshold', 2],
+                ['CircuitBreaker|demo', 'lastFailure', $now],
+                ['CircuitBreaker|demo', 'resetTimeout', 120]
             );
 
         $this->client->expects(self::once())
             ->method('expire')
-            ->with('CircuitBreaker|myApi', 600);
+            ->with('CircuitBreaker|demo', 120);
 
         $this->storage->saveCircuit($circuit);
     }

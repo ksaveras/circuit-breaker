@@ -9,31 +9,45 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
-use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\PsrCache;
+use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 class PsrCacheTest extends TestCase
 {
+    public function testReturnsNullIfNotFound(): void
+    {
+        $adapter = new ArrayAdapter();
+        $storage = new PsrCache($adapter);
+
+        $circuit = $storage->getCircuit('myApi');
+
+        self::assertNull($circuit);
+    }
+
     public function testStorage(): void
     {
         $adapter = new ArrayAdapter();
         $storage = new PsrCache($adapter);
 
-        $storage->saveCircuit(new Circuit('demo'));
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(0)
+            ->build();
 
-        $circuit = $storage->getCircuit('demo');
+        $storage->saveCircuit($circuit);
 
-        $this->assertEquals(0, $circuit->getFailureCount());
+        $circuitB = $storage->getCircuit($circuit->getName());
+
+        self::assertEquals(0, $circuitB->getFailureCount());
 
         $circuit->increaseFailure();
         $storage->saveCircuit($circuit);
 
-        $circuit = $storage->getCircuit('demo');
+        $circuitB = $storage->getCircuit($circuit->getName());
 
-        $this->assertEquals(1, $circuit->getFailureCount());
+        self::assertEquals(1, $circuitB->getFailureCount());
     }
 
     public function testResetCircuit(): void
@@ -41,12 +55,14 @@ class PsrCacheTest extends TestCase
         $adapter = new ArrayAdapter();
         $storage = new PsrCache($adapter);
 
-        $storage->saveCircuit(new Circuit('demo'));
+        $circuit = CircuitBuilder::builder()->build();
 
-        $this->assertTrue($adapter->hasItem(AbstractStorage::storageKey('demo')));
+        $storage->saveCircuit($circuit);
 
-        $storage->resetCircuit('demo');
+        self::assertTrue($adapter->hasItem(AbstractStorage::storageKey($circuit->getName())));
 
-        $this->assertFalse($adapter->hasItem(AbstractStorage::storageKey('demo')));
+        $storage->resetCircuit($circuit->getName());
+
+        self::assertFalse($adapter->hasItem(AbstractStorage::storageKey($circuit->getName())));
     }
 }
