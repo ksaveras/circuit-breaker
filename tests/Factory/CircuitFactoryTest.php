@@ -16,7 +16,7 @@ class CircuitFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $factory = new CircuitFactory(600);
+        $factory = new CircuitFactory(2, 600);
 
         $circuit = $factory->create('demo');
 

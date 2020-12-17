@@ -11,7 +11,9 @@ namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Ksaveras\CircuitBreaker\State;
 use PHPUnit\Framework\TestCase;
+use Symfony\Bridge\PhpUnit\ClockMock;
 
 class CircuitTest extends TestCase
 {
@@ -37,6 +39,7 @@ class CircuitTest extends TestCase
                 'failureCount' => 0,
                 'lastFailure' => null,
                 'resetTimeout' => 60,
+                'failureThreshold' => 5,
             ],
         ];
 
@@ -48,6 +51,7 @@ class CircuitTest extends TestCase
                 'failureCount' => 10,
                 'lastFailure' => $now,
                 'resetTimeout' => 120,
+                'failureThreshold' => 5,
             ],
             [
                 'name' => 'demo',
@@ -55,6 +59,7 @@ class CircuitTest extends TestCase
                 'failureCount' => 10,
                 'lastFailure' => $now,
                 'resetTimeout' => 120,
+                'failureThreshold' => 5,
             ],
         ];
     }
@@ -81,8 +86,46 @@ class CircuitTest extends TestCase
 
         $circuit->reset();
 
-        $this->assertEquals(0, $circuit->getFailureCount());
-        $this->assertNull($circuit->getLastFailure());
-        $this->assertEquals(120, $circuit->getResetTimeout());
+        self::assertEquals(0, $circuit->getFailureCount());
+        self::assertNull($circuit->getLastFailure());
+        self::assertEquals(120, $circuit->getResetTimeout());
+    }
+
+    public function testGetState(): void
+    {
+        $circuit = new Circuit('demo', 0, 2);
+
+        self::assertEquals(State::CLOSED, $circuit->getState());
+
+        $circuit->increaseFailure();
+
+        self::assertEquals(State::CLOSED, $circuit->getState());
+
+        $circuit->increaseFailure();
+
+        self::assertEquals(State::OPEN, $circuit->getState());
+    }
+
+    /**
+     * @runInSeparateProcess
+     */
+    public function testIncreaseFailure(): void
+    {
+        ClockMock::register(Circuit::class);
+        ClockMock::withClockMock(strtotime('2020-12-01 10:00:00'));
+
+        $circuit = new Circuit('demo', 0, 2);
+
+        self::assertEquals(0, $circuit->getFailureCount());
+
+        $circuit->increaseFailure();
+        self::assertEquals(1, $circuit->getFailureCount());
+        self::assertEquals(ClockMock::time(), $circuit->getLastFailure());
+
+        $circuit->increaseFailure();
+        self::assertEquals(2, $circuit->getFailureCount());
+        self::assertEquals(ClockMock::time(), $circuit->getLastFailure());
+
+        ClockMock::withClockMock(false);
     }
 }

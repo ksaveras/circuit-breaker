@@ -11,21 +11,27 @@ namespace Ksaveras\CircuitBreaker\Factory;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-final class CircuitFactory
+final class CircuitFactory implements CircuitFactoryInterface
 {
     /**
      * @var int
      */
     private $resetTimeout;
 
-    public function __construct(int $resetTimeout = 60)
+    /**
+     * @var int
+     */
+    private $failureThreshold;
+
+    public function __construct(int $failureThreshold = 5, int $resetTimeout = 60)
     {
         $this->resetTimeout = $resetTimeout;
+        $this->failureThreshold = $failureThreshold;
     }
 
     public function create(string $name): Circuit
     {
-        $circuit = new Circuit($name);
+        $circuit = new Circuit($name, 0, $this->failureThreshold);
         $circuit->setResetTimeout($this->resetTimeout);
 
         return $circuit;

@@ -26,7 +26,7 @@ final class Circuit
     /**
      * @var int
      */
-    private $failureCount = 0;
+    private $failureCount;
 
     /**
      * @var int|null
@@ -36,11 +36,18 @@ final class Circuit
     /**
      * @var int
      */
+    private $failureThreshold;
+
+    /**
+     * @var int
+     */
     private $resetTimeout = 60;
 
-    public function __construct(string $name)
+    public function __construct(string $name, int $failureCount = 0, ?int $failureThreshold = null)
     {
         $this->name = $name;
+        $this->failureCount = $failureCount;
+        $this->failureThreshold = $failureThreshold ?? 5;
     }
 
     public static function fromArray(array $data): self
@@ -49,10 +56,12 @@ final class Circuit
             throw new CircuitBreakerException('Missing required data field "name"');
         }
 
-        $circuit = new self($data['name']);
+        $failureCount = (int) ($data['failureCount'] ?? 0);
+        $failureThreshold = isset($data['failureThreshold']) ? (int) $data['failureThreshold'] : null;
+
+        $circuit = new self($data['name'], $failureCount, $failureThreshold);
 
         $circuit->setState($data['state'] ?? State::CLOSED);
-        $circuit->setFailureCount($data['failureCount'] ?? 0);
         $circuit->setLastFailure($data['lastFailure'] ?? null);
 
         if (isset($data['resetTimeout'])) {
@@ -69,7 +78,11 @@ final class Circuit
 
     public function getState(): string
     {
-        return $this->state;
+        if ($this->failureCount < $this->failureThreshold) {
+            return State::CLOSED;
+        }
+
+        return (time() - $this->getLastFailure()) > $this->getResetTimeout() ? State::HALF_OPEN : State::OPEN;
     }
 
     public function setState(string $state): self
@@ -84,11 +97,15 @@ final class Circuit
         return $this->failureCount;
     }
 
-    public function setFailureCount(int $failureCount): self
+    public function increaseFailure(): void
     {
-        $this->failureCount = $failureCount;
+        ++$this->failureCount;
+        $this->lastFailure = time();
+    }
 
-        return $this;
+    public function getFailureThreshold(): int
+    {
+        return $this->failureThreshold;
     }
 
     public function getLastFailure(): ?int
@@ -101,12 +118,6 @@ final class Circuit
         $this->lastFailure = $lastFailure;
 
         return $this;
-    }
-
-    public function increaseFailure(): void
-    {
-        ++$this->failureCount;
-        $this->lastFailure = time();
     }
 
     public function getResetTimeout(): int
@@ -134,8 +145,9 @@ final class Circuit
     {
         return [
             'name' => $this->name,
-            'state' => $this->state,
+            'state' => $this->getState(),
             'failureCount' => $this->failureCount,
+            'failureThreshold' => $this->failureThreshold,
             'lastFailure' => $this->lastFailure,
             'resetTimeout' => $this->resetTimeout,
         ];
