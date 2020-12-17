@@ -20,11 +20,10 @@ use \Ksaveras\CircuitBreaker\Storage\Apcu;
 use \Ksaveras\CircuitBreaker\CircuitBreaker;
 use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 
-$storage = new Apcu();
-$period = 300;
+$failureThreshold = 3;
+$resetTtl = 300;
 
-$circuitBreaker = new CircuitBreaker('service-api', $storage, new CircuitFactory($period));
-$circuitBreaker->setFailureThreshold(3);
+$circuitBreaker = new CircuitBreaker('service-api', new Apcu(), new CircuitFactory($failureThreshold, $resetTtl));
 
 if ($circuitBreaker->isAvailable()) {
     try {
@@ -43,11 +42,10 @@ use \Ksaveras\CircuitBreaker\CircuitBreaker;
 use \Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 
-$storage = new Apcu();
-$period = 300;
+$failureThreshold = 3;
+$resetTtl = 300;
 
-$circuitBreaker = new CircuitBreaker('service-api', $storage, new CircuitFactory($period));
-$circuitBreaker->setFailureThreshold(3);
+$circuitBreaker = new CircuitBreaker('service-api', new Apcu(), new CircuitFactory($failureThreshold, $resetTtl));
 
 try {
     $circuitBreaker->call(
