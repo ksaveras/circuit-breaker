@@ -16,11 +16,10 @@ class CircuitFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $factory = new CircuitFactory(2, 600);
+        $factory = new CircuitFactory(2);
 
         $circuit = $factory->create('demo');
 
         self::assertEquals('demo', $circuit->getName());
-        self::assertEquals(600, $circuit->getResetTimeout());
     }
 }

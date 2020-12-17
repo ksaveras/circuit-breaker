@@ -10,6 +10,7 @@
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
+use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Storage\PhpArray;
 use PHPUnit\Framework\TestCase;
 
@@ -18,6 +19,7 @@ class PhpArrayTest extends TestCase
     public function testStorage(): void
     {
         $storage = new PhpArray();
+        $policy = new ConstantRetryPolicy();
 
         $storage->saveCircuit(new Circuit('demo1'));
 
@@ -25,7 +27,7 @@ class PhpArrayTest extends TestCase
 
         self::assertEquals(0, $circuit->getFailureCount());
 
-        $circuit->increaseFailure();
+        $circuit->increaseFailure($policy);
         $storage->saveCircuit($circuit);
 
         $circuit = $storage->getCircuit('demo1');

@@ -11,6 +11,7 @@ namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
+use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
@@ -31,11 +32,21 @@ class CircuitBreaker
      */
     private $factory;
 
-    public function __construct(string $name, StorageInterface $storage, CircuitFactory $factory)
-    {
+    /**
+     * @var RetryPolicyInterface
+     */
+    private $retryPolicy;
+
+    public function __construct(
+        string $name,
+        StorageInterface $storage,
+        CircuitFactory $factory,
+        RetryPolicyInterface $retryPolicy
+    ) {
         $this->name = AbstractStorage::validateKey($name);
         $this->storage = $storage;
         $this->factory = $factory;
+        $this->retryPolicy = $retryPolicy;
     }
 
     public function getName(): string
@@ -94,7 +105,7 @@ class CircuitBreaker
     public function failure(): void
     {
         $circuit = $this->getCircuit();
-        $circuit->increaseFailure();
+        $circuit->increaseFailure($this->retryPolicy);
         $this->saveCircuit($circuit);
     }
 

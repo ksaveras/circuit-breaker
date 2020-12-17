@@ -16,24 +16,15 @@ final class CircuitFactory implements CircuitFactoryInterface
     /**
      * @var int
      */
-    private $resetTimeout;
-
-    /**
-     * @var int
-     */
     private $failureThreshold;
 
-    public function __construct(int $failureThreshold = 5, int $resetTimeout = 60)
+    public function __construct(int $failureThreshold = 5)
     {
-        $this->resetTimeout = $resetTimeout;
         $this->failureThreshold = $failureThreshold;
     }
 
     public function create(string $name): Circuit
     {
-        $circuit = new Circuit($name, 0, $this->failureThreshold);
-        $circuit->setResetTimeout($this->resetTimeout);
-
-        return $circuit;
+        return new Circuit($name, 0, $this->failureThreshold);
     }
 }

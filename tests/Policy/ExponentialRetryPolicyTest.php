@@ -50,46 +50,58 @@ class ExponentialRetryPolicyTest extends TestCase
     public function testCalculateRetryTtl(): void
     {
         $policy = new ExponentialRetryPolicy(0);
+
         $circuit = CircuitBuilder::builder()
             ->withFailureCount(2)
             ->withFailureThreshold(2)
             ->build();
-
         self::assertEquals(1, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(3)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(2, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(4)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(4, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(5)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(8, $policy->calculate($circuit));
     }
 
     public function testCalculateMaximumRetryTtl(): void
     {
         $policy = new ExponentialRetryPolicy(0, 50);
+
         $circuit = CircuitBuilder::builder()
             ->withFailureCount(6)
             ->withFailureThreshold(2)
             ->build();
-
         self::assertEquals(16, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(7)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(32, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(8)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(50, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(9)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(50, $policy->calculate($circuit));
     }
 }

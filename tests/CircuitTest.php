@@ -11,6 +11,7 @@ namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
@@ -35,7 +36,6 @@ class CircuitTest extends TestCase
             ],
             [
                 'name' => 'demo',
-                'state' => 'closed',
                 'failureCount' => 0,
                 'lastFailure' => null,
                 'resetTimeout' => 60,
@@ -47,7 +47,6 @@ class CircuitTest extends TestCase
         yield [
             [
                 'name' => 'demo',
-                'state' => 'open',
                 'failureCount' => 10,
                 'lastFailure' => $now,
                 'resetTimeout' => 120,
@@ -55,7 +54,6 @@ class CircuitTest extends TestCase
             ],
             [
                 'name' => 'demo',
-                'state' => 'open',
                 'failureCount' => 10,
                 'lastFailure' => $now,
                 'resetTimeout' => 120,
@@ -77,7 +75,6 @@ class CircuitTest extends TestCase
         $circuit = Circuit::fromArray(
             [
                 'name' => 'demo',
-                'state' => 'open',
                 'failureCount' => 10,
                 'lastFailure' => time(),
                 'resetTimeout' => 120,
@@ -94,14 +91,15 @@ class CircuitTest extends TestCase
     public function testGetState(): void
     {
         $circuit = new Circuit('demo', 0, 2);
+        $policy = new ConstantRetryPolicy();
 
         self::assertEquals(State::CLOSED, $circuit->getState());
 
-        $circuit->increaseFailure();
+        $circuit->increaseFailure($policy);
 
         self::assertEquals(State::CLOSED, $circuit->getState());
 
-        $circuit->increaseFailure();
+        $circuit->increaseFailure($policy);
 
         self::assertEquals(State::OPEN, $circuit->getState());
     }
@@ -115,14 +113,15 @@ class CircuitTest extends TestCase
         ClockMock::withClockMock(strtotime('2020-12-01 10:00:00'));
 
         $circuit = new Circuit('demo', 0, 2);
+        $policy = new ConstantRetryPolicy();
 
         self::assertEquals(0, $circuit->getFailureCount());
 
-        $circuit->increaseFailure();
+        $circuit->increaseFailure($policy);
         self::assertEquals(1, $circuit->getFailureCount());
         self::assertEquals(ClockMock::time(), $circuit->getLastFailure());
 
-        $circuit->increaseFailure();
+        $circuit->increaseFailure($policy);
         self::assertEquals(2, $circuit->getFailureCount());
         self::assertEquals(ClockMock::time(), $circuit->getLastFailure());
 

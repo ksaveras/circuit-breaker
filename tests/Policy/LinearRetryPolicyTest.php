@@ -50,42 +50,52 @@ class LinearRetryPolicyTest extends TestCase
     public function testCalculateRetryTtl(): void
     {
         $policy = new LinearRetryPolicy(10, 5, 100);
+
         $circuit = CircuitBuilder::builder()
             ->withFailureCount(1)
             ->withFailureThreshold(2)
             ->build();
-
         self::assertEquals(10, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(2)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(10, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(3)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(15, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(4)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(20, $policy->calculate($circuit));
     }
 
     public function testCalculateMaximumRetryTtl(): void
     {
         $policy = new LinearRetryPolicy(20, 50, 100);
+
         $circuit = CircuitBuilder::builder()
             ->withFailureCount(3)
             ->withFailureThreshold(2)
             ->build();
-
         self::assertEquals(70, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(4)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(100, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()
+            ->withFailureCount(5)
+            ->withFailureThreshold(2)
+            ->build();
         self::assertEquals(100, $policy->calculate($circuit));
     }
 }

@@ -9,6 +9,7 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
+use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\PsrCache;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
@@ -31,6 +32,7 @@ class PsrCacheTest extends TestCase
     {
         $adapter = new ArrayAdapter();
         $storage = new PsrCache($adapter);
+        $policy = new ConstantRetryPolicy();
 
         $circuit = CircuitBuilder::builder()
             ->withFailureCount(0)
@@ -42,7 +44,7 @@ class PsrCacheTest extends TestCase
 
         self::assertEquals(0, $circuitB->getFailureCount());
 
-        $circuit->increaseFailure();
+        $circuit->increaseFailure($policy);
         $storage->saveCircuit($circuit);
 
         $circuitB = $storage->getCircuit($circuit->getName());

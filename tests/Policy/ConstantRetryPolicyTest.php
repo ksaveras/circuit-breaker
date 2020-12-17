@@ -26,16 +26,14 @@ class ConstantRetryPolicyTest extends TestCase
     public function testCalculateRetryTtl(): void
     {
         $policy = new ConstantRetryPolicy(600);
-        $circuit = CircuitBuilder::builder()->build();
 
+        $circuit = CircuitBuilder::builder()->withFailureCount(0)->build();
         self::assertEquals(600, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()->withFailureCount(2)->build();
         self::assertEquals(600, $policy->calculate($circuit));
 
-        $circuit->increaseFailure();
-
+        $circuit = CircuitBuilder::builder()->withFailureCount(4)->build();
         self::assertEquals(600, $policy->calculate($circuit));
     }
 }

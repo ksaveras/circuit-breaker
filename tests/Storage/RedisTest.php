@@ -51,7 +51,6 @@ class RedisTest extends TestCase
     {
         $circuitData = [
             'name' => 'myApi',
-            'state' => 'open',
             'failureCount' => 10,
             'failureThreshold' => 3,
             'lastFailure' => time(),
@@ -75,11 +74,10 @@ class RedisTest extends TestCase
         $circuit = CircuitBuilder::builder()->build();
 
         $this->client
-            ->expects(self::exactly(7))
+            ->expects(self::exactly(6))
             ->method('__call')
             ->withConsecutive(
                 ['hset', ['CircuitBreaker|demo', 'name', 'demo']],
-                ['hset', ['CircuitBreaker|demo', 'state', 'open']],
                 ['hset', ['CircuitBreaker|demo', 'failureCount', 3]],
                 ['hset', ['CircuitBreaker|demo', 'failureThreshold', 2]],
                 ['hset', ['CircuitBreaker|demo', 'lastFailure', $now]],

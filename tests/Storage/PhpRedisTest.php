@@ -50,7 +50,6 @@ class PhpRedisTest extends TestCase
     {
         $circuitData = [
             'name' => 'myApi',
-            'state' => 'open',
             'failureCount' => 10,
             'lastFailure' => time(),
             'resetTimeout' => 600,
@@ -73,11 +72,10 @@ class PhpRedisTest extends TestCase
 
         $circuit = CircuitBuilder::builder()->build();
 
-        $this->client->expects(self::exactly(6))
+        $this->client->expects(self::exactly(5))
             ->method('hSet')
             ->withConsecutive(
                 ['CircuitBreaker|demo', 'name', 'demo'],
-                ['CircuitBreaker|demo', 'state', 'open'],
                 ['CircuitBreaker|demo', 'failureCount', 3],
                 ['CircuitBreaker|demo', 'failureThreshold', 2],
                 ['CircuitBreaker|demo', 'lastFailure', $now],

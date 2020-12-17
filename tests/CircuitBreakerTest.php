@@ -12,6 +12,7 @@ namespace Ksaveras\CircuitBreaker\Tests;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
+use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\PhpArray;
 use PHPUnit\Framework\TestCase;
@@ -28,7 +29,7 @@ class CircuitBreakerTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new CircuitBreaker('demo', new PhpArray(), new CircuitFactory(2));
+        $this->service = new CircuitBreaker('demo', new PhpArray(), new CircuitFactory(2), new ConstantRetryPolicy(50));
     }
 
     public function testReturnsName(): void
@@ -91,50 +92,44 @@ class CircuitBreakerTest extends TestCase
         ClockMock::register(CircuitBreaker::class);
         ClockMock::withClockMock(true);
 
-        $storage = new PhpArray();
-        $service = (new CircuitBreaker('demo', $storage, new CircuitFactory(2, 10)));
-
         try {
-            $service->call($this->failingClosure());
+            $this->service->call($this->failingClosure());
         } catch (\Exception $exception) {
         }
-        self::assertEquals(State::CLOSED, $service->getState());
+        self::assertEquals(State::CLOSED, $this->service->getState());
 
         try {
-            $service->call($this->failingClosure());
+            $this->service->call($this->failingClosure());
         } catch (\Exception $exception) {
         }
-        self::assertEquals(State::OPEN, $service->getState());
+        self::assertEquals(State::OPEN, $this->service->getState());
 
-        sleep(11);
+        sleep(100);
 
         try {
-            $service->call($this->successClosure());
+            $this->service->call($this->successClosure());
         } catch (\Exception $exception) {
         }
-        self::assertEquals(State::CLOSED, $service->getState());
+        self::assertEquals(State::CLOSED, $this->service->getState());
 
         ClockMock::withClockMock(false);
     }
 
     public function testCircuitFunctions(): void
     {
-        $storage = new PhpArray();
-        $service = (new CircuitBreaker('demo', $storage, new CircuitFactory(2, 10)));
+        self::assertTrue($this->service->isAvailable());
 
-        self::assertTrue($service->isAvailable());
+        $this->service->failure();
 
-        $service->failure();
+        self::assertTrue($this->service->isAvailable());
 
-        self::assertTrue($service->isAvailable());
+        $this->service->failure();
 
-        $service->failure();
+        self::assertFalse($this->service->isAvailable());
 
-        self::assertFalse($service->isAvailable());
+        $this->service->success();
 
-        $service->success();
-
-        self::assertTrue($service->isAvailable());
+        self::assertTrue($this->service->isAvailable());
     }
 
     private function failingClosure(): \Closure

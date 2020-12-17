@@ -10,6 +10,7 @@
 namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 
 final class Circuit
 {
@@ -17,11 +18,6 @@ final class Circuit
      * @var string
      */
     private $name;
-
-    /**
-     * @var string
-     */
-    private $state = State::CLOSED;
 
     /**
      * @var int
@@ -61,7 +57,6 @@ final class Circuit
 
         $circuit = new self($data['name'], $failureCount, $failureThreshold);
 
-        $circuit->setState($data['state'] ?? State::CLOSED);
         $circuit->setLastFailure($data['lastFailure'] ?? null);
 
         if (isset($data['resetTimeout'])) {
@@ -85,22 +80,16 @@ final class Circuit
         return (time() - $this->getLastFailure()) > $this->getResetTimeout() ? State::HALF_OPEN : State::OPEN;
     }
 
-    public function setState(string $state): self
-    {
-        $this->state = $state;
-
-        return $this;
-    }
-
     public function getFailureCount(): int
     {
         return $this->failureCount;
     }
 
-    public function increaseFailure(): void
+    public function increaseFailure(RetryPolicyInterface $policy): void
     {
         ++$this->failureCount;
         $this->lastFailure = time();
+        $this->resetTimeout = $policy->calculate($this);
     }
 
     public function getFailureThreshold(): int
@@ -145,7 +134,6 @@ final class Circuit
     {
         return [
             'name' => $this->name,
-            'state' => $this->getState(),
             'failureCount' => $this->failureCount,
             'failureThreshold' => $this->failureThreshold,
             'lastFailure' => $this->lastFailure,
