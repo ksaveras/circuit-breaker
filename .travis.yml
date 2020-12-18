@@ -18,7 +18,7 @@ cache:
 
 before_install:
   - echo "extension = redis.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-  - if [[ "$(php -v | grep 'PHP 7')" ]]; then echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini; fi
+  - echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
 
 before_script:
   - curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter
