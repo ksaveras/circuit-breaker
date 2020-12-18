@@ -106,9 +106,8 @@ class CircuitBuilder
         return Circuit::fromArray(
             [
                 'name' => $this->name,
-                'failureCount' => $this->failureCount,
                 'failureThreshold' => $this->failureThreshold,
-                'state' => $this->state,
+                'failureCount' => $this->failureCount,
                 'lastFailure' => $this->lastFailure,
                 'resetTimeout' => $this->resetTimeout,
             ]

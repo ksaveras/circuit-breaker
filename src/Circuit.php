@@ -37,13 +37,20 @@ final class Circuit
     /**
      * @var int
      */
-    private $resetTimeout = 60;
+    private $resetTimeout;
 
-    public function __construct(string $name, int $failureCount = 0, ?int $failureThreshold = null)
-    {
+    public function __construct(
+        string $name,
+        int $failureThreshold = 5,
+        int $failureCount = 0,
+        ?int $lastFailure = null,
+        int $resetTimeout = 60
+    ) {
         $this->name = $name;
+        $this->failureThreshold = $failureThreshold;
         $this->failureCount = $failureCount;
-        $this->failureThreshold = $failureThreshold ?? 5;
+        $this->lastFailure = $lastFailure;
+        $this->resetTimeout = $resetTimeout;
     }
 
     public static function fromArray(array $data): self
@@ -53,17 +60,11 @@ final class Circuit
         }
 
         $failureCount = (int) ($data['failureCount'] ?? 0);
-        $failureThreshold = isset($data['failureThreshold']) ? (int) $data['failureThreshold'] : null;
+        $failureThreshold = (int) ($data['failureThreshold'] ?? 5);
+        $lastFailure = isset($data['lastFailure']) ? (int) $data['lastFailure'] : null;
+        $resetTimeout = (int) ($data['resetTimeout'] ?? 60);
 
-        $circuit = new self($data['name'], $failureCount, $failureThreshold);
-
-        $circuit->setLastFailure($data['lastFailure'] ?? null);
-
-        if (isset($data['resetTimeout'])) {
-            $circuit->setResetTimeout($data['resetTimeout']);
-        }
-
-        return $circuit;
+        return new self($data['name'], $failureThreshold, $failureCount, $lastFailure, $resetTimeout);
     }
 
     public function getName(): string
@@ -102,23 +103,9 @@ final class Circuit
         return $this->lastFailure;
     }
 
-    public function setLastFailure(?int $lastFailure): self
-    {
-        $this->lastFailure = $lastFailure;
-
-        return $this;
-    }
-
     public function getResetTimeout(): int
     {
         return $this->resetTimeout;
-    }
-
-    public function setResetTimeout(int $resetTimeout): self
-    {
-        $this->resetTimeout = $resetTimeout;
-
-        return $this;
     }
 
     public function reset(): void

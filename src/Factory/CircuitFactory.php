@@ -25,6 +25,6 @@ final class CircuitFactory implements CircuitFactoryInterface
 
     public function create(string $name): Circuit
     {
-        return new Circuit($name, 0, $this->failureThreshold);
+        return new Circuit($name, $this->failureThreshold);
     }
 }
