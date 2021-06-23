@@ -11,16 +11,17 @@
         }
     ],
     "require": {
-        "php": "^7.3 || ^8.0"
+        "php": ">=7.2.5",
+        "symfony/options-resolver": "^4.4|^5.0|^6.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^2.17",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^0.12.5",
         "phpstan/phpstan-phpunit": "^0.12.6",
         "phpunit/phpunit": "^9.5",
         "predis/predis": "^1.1",
-        "symfony/cache": "^4.0|^5.0",
-        "symfony/phpunit-bridge": "^4.0|^5.0"
+        "symfony/cache": "^4.4|^5.0|^6.0",
+        "symfony/phpunit-bridge": "^4.4|^5.0|^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -41,7 +42,7 @@
     },
     "scripts": {
         "phpcsfix": "@php ./vendor/bin/php-cs-fixer fix",
-        "phpcscheck": "@php ./vendor/bin/php-cs-fixer fix --dry-run --diff --diff-format=udiff",
+        "phpcscheck": "@php ./vendor/bin/php-cs-fixer fix --dry-run --diff",
         "phpstan": "@php ./vendor/bin/phpstan analyse src tests",
         "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit"
     },
