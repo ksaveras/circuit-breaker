@@ -9,15 +9,15 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
-use Ksaveras\CircuitBreaker\Storage\PhpRedis;
+use Ksaveras\CircuitBreaker\Storage\RedisStorage;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class PhpRedisTest extends TestCase
+class RedisStorageTest extends TestCase
 {
     /**
-     * @var PhpRedis
+     * @var RedisStorage
      */
     private $storage;
 
@@ -31,7 +31,7 @@ class PhpRedisTest extends TestCase
         parent::setUp();
 
         $this->client = $this->createMock(\Redis::class);
-        $this->storage = new PhpRedis($this->client);
+        $this->storage = new RedisStorage($this->client);
     }
 
     public function testReturnsNullIfNotFound(): void

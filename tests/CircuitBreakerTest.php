@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
-use Ksaveras\CircuitBreaker\Storage\PhpArray;
+use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
@@ -29,7 +29,7 @@ class CircuitBreakerTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new CircuitBreaker('demo', new PhpArray(), new CircuitFactory(2), new ConstantRetryPolicy(50));
+        $this->service = new CircuitBreaker('demo', new InMemoryStorage(), new CircuitFactory(2), new ConstantRetryPolicy(50));
     }
 
     public function testReturnsName(): void

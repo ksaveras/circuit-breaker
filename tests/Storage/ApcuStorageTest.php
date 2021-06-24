@@ -10,14 +10,14 @@
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
 use Ksaveras\CircuitBreaker\State;
-use Ksaveras\CircuitBreaker\Storage\Apcu;
+use Ksaveras\CircuitBreaker\Storage\ApcuStorage;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 
-class ApcuTest extends TestCase
+class ApcuStorageTest extends TestCase
 {
     /**
-     * @var Apcu
+     * @var ApcuStorage
      */
     private $storage;
 
@@ -25,7 +25,7 @@ class ApcuTest extends TestCase
     {
         parent::setUp();
 
-        $this->storage = new Apcu();
+        $this->storage = new ApcuStorage();
     }
 
     public function testSaveCircuit(): void

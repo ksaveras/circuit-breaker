@@ -9,16 +9,16 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
-use Ksaveras\CircuitBreaker\Storage\Redis;
+use Ksaveras\CircuitBreaker\Storage\PredisStorage;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Predis\ClientInterface;
 
-class RedisTest extends TestCase
+class PredisStorageTest extends TestCase
 {
     /**
-     * @var Redis
+     * @var PredisStorage
      */
     private $storage;
 
@@ -32,7 +32,7 @@ class RedisTest extends TestCase
         parent::setUp();
 
         $this->client = $this->createMock(ClientInterface::class);
-        $this->storage = new Redis($this->client);
+        $this->storage = new PredisStorage($this->client);
     }
 
     public function testReturnsNullIfNotFound(): void

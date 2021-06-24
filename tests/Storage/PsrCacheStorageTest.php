@@ -11,17 +11,17 @@ namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
-use Ksaveras\CircuitBreaker\Storage\PsrCache;
+use Ksaveras\CircuitBreaker\Storage\PsrCacheStorage;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
-class PsrCacheTest extends TestCase
+class PsrCacheStorageTest extends TestCase
 {
     public function testReturnsNullIfNotFound(): void
     {
         $adapter = new ArrayAdapter();
-        $storage = new PsrCache($adapter);
+        $storage = new PsrCacheStorage($adapter);
 
         $circuit = $storage->getCircuit('myApi');
 
@@ -31,7 +31,7 @@ class PsrCacheTest extends TestCase
     public function testStorage(): void
     {
         $adapter = new ArrayAdapter();
-        $storage = new PsrCache($adapter);
+        $storage = new PsrCacheStorage($adapter);
         $policy = new ConstantRetryPolicy();
 
         $circuit = CircuitBuilder::builder()
@@ -55,7 +55,7 @@ class PsrCacheTest extends TestCase
     public function testResetCircuit(): void
     {
         $adapter = new ArrayAdapter();
-        $storage = new PsrCache($adapter);
+        $storage = new PsrCacheStorage($adapter);
 
         $circuit = CircuitBuilder::builder()->build();
 

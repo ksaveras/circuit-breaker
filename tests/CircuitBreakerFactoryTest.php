@@ -10,7 +10,7 @@
 namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
-use Ksaveras\CircuitBreaker\Storage\PhpArray;
+use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
@@ -21,7 +21,7 @@ class CircuitBreakerFactoryTest extends TestCase
      */
     public function testCreate(array $config): void
     {
-        $factory = new CircuitBreakerFactory($config, new PhpArray());
+        $factory = new CircuitBreakerFactory($config, new InMemoryStorage());
 
         $circuitBreaker = $factory->create('name');
 
@@ -65,7 +65,7 @@ class CircuitBreakerFactoryTest extends TestCase
         $this->expectException(InvalidOptionsException::class);
         $this->expectExceptionMessage('The option "retry_policy" with value "nonexistent" is invalid. Accepted values are: "constant", "exponential", "linear".');
 
-        $factory = new CircuitBreakerFactory(['retry_policy' => 'nonexistent'], new PhpArray());
+        $factory = new CircuitBreakerFactory(['retry_policy' => 'nonexistent'], new InMemoryStorage());
 
         $factory->create('name');
     }

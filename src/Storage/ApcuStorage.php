@@ -11,22 +11,12 @@ namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class PhpRedis extends AbstractStorage
+class ApcuStorage extends AbstractStorage
 {
-    /**
-     * @var \Redis
-     */
-    protected $client;
-
-    public function __construct(\Redis $client)
-    {
-        $this->client = $client;
-    }
-
     public function getCircuit(string $name): ?Circuit
     {
-        $data = $this->client->hGetAll(static::storageKey($name));
-        if (empty($data)) {
+        $data = apcu_fetch(static::storageKey($name));
+        if (false === $data) {
             return null;
         }
 
@@ -35,17 +25,11 @@ class PhpRedis extends AbstractStorage
 
     public function saveCircuit(Circuit $circuit): void
     {
-        $data = $circuit->toArray();
-        $name = static::storageKey($circuit->getName());
-        foreach ($data as $key => $datum) {
-            $this->client->hSet($name, $key, (string) $datum);
-        }
-
-        $this->client->expire($name, $circuit->getResetTimeout());
+        apcu_store(static::storageKey($circuit->getName()), $circuit->toArray());
     }
 
     public function resetCircuit(string $name): void
     {
-        $this->client->del(static::storageKey($name));
+        apcu_delete(static::storageKey($name));
     }
 }

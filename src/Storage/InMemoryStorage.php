@@ -11,7 +11,7 @@ namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class PhpArray extends AbstractStorage
+class InMemoryStorage extends AbstractStorage
 {
     /**
      * @var Circuit[]|array

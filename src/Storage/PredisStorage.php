@@ -12,7 +12,7 @@ namespace Ksaveras\CircuitBreaker\Storage;
 use Ksaveras\CircuitBreaker\Circuit;
 use Predis\ClientInterface;
 
-class Redis extends AbstractStorage
+class PredisStorage extends AbstractStorage
 {
     /**
      * @var ClientInterface

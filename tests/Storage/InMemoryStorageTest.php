@@ -11,14 +11,14 @@ namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
-use Ksaveras\CircuitBreaker\Storage\PhpArray;
+use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
 
-class PhpArrayTest extends TestCase
+class InMemoryStorageTest extends TestCase
 {
     public function testStorage(): void
     {
-        $storage = new PhpArray();
+        $storage = new InMemoryStorage();
         $policy = new ConstantRetryPolicy();
 
         $storage->saveCircuit(new Circuit('demo1'));

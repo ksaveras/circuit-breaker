@@ -15,8 +15,9 @@ composer require ksaveras/circuit-breaker
 ## Use
 
 Simple circuit check
+
 ```php
-use \Ksaveras\CircuitBreaker\Storage\Apcu;
+use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
 use \Ksaveras\CircuitBreaker\CircuitBreaker;
 use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 use \Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
@@ -24,7 +25,7 @@ use \Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
 $failureThreshold = 3;
 $resetTtl = 300;
 $factory = new CircuitFactory($failureThreshold);
-$storage = new Apcu();
+$storage = new ApcuStorage();
 $retryPolicy = new ExponentialRetryPolicy($resetTtl);
 
 $circuitBreaker = new CircuitBreaker('service-api', $storage, $factory, $retryPolicy);
@@ -40,8 +41,9 @@ if ($circuitBreaker->isAvailable()) {
 ```
 
 Use callback
+
 ```php
-use \Ksaveras\CircuitBreaker\Storage\Apcu;
+use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
 use \Ksaveras\CircuitBreaker\CircuitBreaker;
 use \Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
@@ -50,7 +52,7 @@ use \Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
 $failureThreshold = 3;
 $resetTtl = 300;
 $factory = new CircuitFactory($failureThreshold);
-$storage = new Apcu();
+$storage = new ApcuStorage();
 $retryPolicy = new ExponentialRetryPolicy($resetTtl);
 
 $circuitBreaker = new CircuitBreaker('service-api', $storage, $factory, $retryPolicy);
