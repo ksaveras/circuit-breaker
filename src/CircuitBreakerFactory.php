@@ -56,7 +56,7 @@ final class CircuitBreakerFactory
 
     public function create(string $name): CircuitBreaker
     {
-        return new CircuitBreaker($name, $this->storage, new CircuitFactory($this->config['failure_threshold']), $this->createRetryPolicy());
+        return new CircuitBreaker($name, $this->config['failure_threshold'], $this->createRetryPolicy(), $this->storage);
     }
 
     private function createRetryPolicy(): RetryPolicyInterface

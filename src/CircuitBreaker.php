@@ -10,7 +10,6 @@
 namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
-use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
@@ -23,30 +22,30 @@ class CircuitBreaker
     private $name;
 
     /**
-     * @var StorageInterface
+     * @var int
      */
-    private $storage;
-
-    /**
-     * @var CircuitFactory
-     */
-    private $factory;
+    private $failureThreshold;
 
     /**
      * @var RetryPolicyInterface
      */
     private $retryPolicy;
 
+    /**
+     * @var StorageInterface
+     */
+    private $storage;
+
     public function __construct(
         string $name,
-        StorageInterface $storage,
-        CircuitFactory $factory,
-        RetryPolicyInterface $retryPolicy
+        int $failureThreshold,
+        RetryPolicyInterface $retryPolicy,
+        StorageInterface $storage
     ) {
         $this->name = AbstractStorage::validateKey($name);
-        $this->storage = $storage;
-        $this->factory = $factory;
+        $this->failureThreshold = $failureThreshold;
         $this->retryPolicy = $retryPolicy;
+        $this->storage = $storage;
     }
 
     public function getName(): string
@@ -67,7 +66,6 @@ class CircuitBreaker
     public function call(callable $closure)
     {
         $circuit = $this->getCircuit();
-
         $state = $circuit->getState();
 
         switch ($state) {
@@ -108,20 +106,15 @@ class CircuitBreaker
     {
         $circuit = $this->getCircuit();
         $circuit->increaseFailure($this->retryPolicy);
-        $this->saveCircuit($circuit);
+        $this->storage->saveCircuit($circuit);
     }
 
     protected function getCircuit(): Circuit
     {
         if (null === $circuit = $this->storage->getCircuit($this->name)) {
-            $circuit = $this->factory->create($this->name);
+            $circuit = new Circuit($this->name, $this->failureThreshold);
         }
 
         return $circuit;
-    }
-
-    private function saveCircuit(Circuit $circuit): void
-    {
-        $this->storage->saveCircuit($circuit);
     }
 }
