@@ -11,7 +11,6 @@ namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
-use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
@@ -29,7 +28,7 @@ class CircuitBreakerTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new CircuitBreaker('demo', new InMemoryStorage(), new CircuitFactory(2), new ConstantRetryPolicy(50));
+        $this->service = new CircuitBreaker('demo', 2, new ConstantRetryPolicy(50), new InMemoryStorage());
     }
 
     public function testReturnsName(): void
@@ -139,10 +138,10 @@ class CircuitBreakerTest extends TestCase
         };
     }
 
-    private function successClosure(string $result = 'success'): \Closure
+    private function successClosure(): \Closure
     {
-        return static function () use ($result) {
-            return $result;
+        return static function () {
+            return 'success';
         };
     }
 }
