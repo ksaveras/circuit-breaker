@@ -17,18 +17,19 @@ composer require ksaveras/circuit-breaker
 Simple circuit check
 
 ```php
+use \Ksaveras\CircuitBreaker\CircuitBreakerFactory;
 use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
-use \Ksaveras\CircuitBreaker\CircuitBreaker;
-use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
-use \Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
 
-$failureThreshold = 3;
-$resetTtl = 300;
-$factory = new CircuitFactory($failureThreshold);
-$storage = new ApcuStorage();
-$retryPolicy = new ExponentialRetryPolicy($resetTtl);
+$factory = new CircuitBreakerFactory(
+    [
+        'failure_threshold' => 3,
+        'retry_policy' => 'exponential',
+        'reset_timeout_ms' => 300,
+    ],
+    new ApcuStorage()
+);
 
-$circuitBreaker = new CircuitBreaker('service-api', $storage, $factory, $retryPolicy);
+$circuitBreaker = $factory->create('service-api');
 
 if ($circuitBreaker->isAvailable()) {
     try {
@@ -43,19 +44,20 @@ if ($circuitBreaker->isAvailable()) {
 Use callback
 
 ```php
-use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
-use \Ksaveras\CircuitBreaker\CircuitBreaker;
 use \Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
-use \Ksaveras\CircuitBreaker\Factory\CircuitFactory;
-use \Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
+use \Ksaveras\CircuitBreaker\CircuitBreakerFactory;
+use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
 
-$failureThreshold = 3;
-$resetTtl = 300;
-$factory = new CircuitFactory($failureThreshold);
-$storage = new ApcuStorage();
-$retryPolicy = new ExponentialRetryPolicy($resetTtl);
+$factory = new CircuitBreakerFactory(
+    [
+        'failure_threshold' => 3,
+        'retry_policy' => 'exponential',
+        'reset_timeout_ms' => 300,
+    ],
+    new ApcuStorage()
+);
 
-$circuitBreaker = new CircuitBreaker('service-api', $storage, $factory, $retryPolicy);
+$circuitBreaker = $factory->create('service-api');
 
 try {
     $circuitBreaker->call(
