@@ -14,30 +14,15 @@ use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 
 final class Circuit
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var int
-     */
-    private $failureCount;
+    private int $failureCount;
 
-    /**
-     * @var int|null
-     */
-    private $lastFailure;
+    private ?int $lastFailure;
 
-    /**
-     * @var int
-     */
-    private $failureThreshold;
+    private int $failureThreshold;
 
-    /**
-     * @var int
-     */
-    private $resetTimeout;
+    private int $resetTimeout;
 
     public function __construct(
         string $name,

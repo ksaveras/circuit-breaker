@@ -24,14 +24,14 @@ class InMemoryStorageTest extends TestCase
         $storage->saveCircuit(new Circuit('demo1'));
 
         $circuit = $storage->getCircuit('demo1');
-
+        self::assertNotNull($circuit);
         self::assertEquals(0, $circuit->getFailureCount());
 
         $circuit->increaseFailure($policy);
         $storage->saveCircuit($circuit);
 
         $circuit = $storage->getCircuit('demo1');
-
+        self::assertNotNull($circuit);
         self::assertEquals(1, $circuit->getFailureCount());
     }
 }

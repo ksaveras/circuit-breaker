@@ -19,10 +19,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 
 class CircuitBreakerTest extends TestCase
 {
-    /**
-     * @var CircuitBreaker
-     */
-    private $service;
+    private CircuitBreaker $service;
 
     protected function setUp(): void
     {

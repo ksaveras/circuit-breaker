@@ -16,10 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class ApcuStorageTest extends TestCase
 {
-    /**
-     * @var ApcuStorage
-     */
-    private $storage;
+    private ApcuStorage $storage;
 
     protected function setUp(): void
     {
@@ -42,6 +39,7 @@ class ApcuStorageTest extends TestCase
         $this->storage->saveCircuit($circuit);
 
         $circuitB = $this->storage->getCircuit('demo');
+        self::assertNotNull($circuitB);
         self::assertEquals(State::OPEN, $circuitB->getState());
         self::assertEquals(10, $circuitB->getFailureCount());
         self::assertEquals($circuit->getLastFailure(), $circuitB->getLastFailure());

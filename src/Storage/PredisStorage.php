@@ -14,10 +14,7 @@ use Predis\ClientInterface;
 
 class PredisStorage extends AbstractStorage
 {
-    /**
-     * @var ClientInterface
-     */
-    protected $client;
+    protected ClientInterface $client;
 
     public function __construct(ClientInterface $client)
     {

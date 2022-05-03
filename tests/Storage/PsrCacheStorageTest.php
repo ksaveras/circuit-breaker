@@ -41,14 +41,14 @@ class PsrCacheStorageTest extends TestCase
         $storage->saveCircuit($circuit);
 
         $circuitB = $storage->getCircuit($circuit->getName());
-
+        self::assertNotNull($circuitB);
         self::assertEquals(0, $circuitB->getFailureCount());
 
         $circuit->increaseFailure($policy);
         $storage->saveCircuit($circuit);
 
         $circuitB = $storage->getCircuit($circuit->getName());
-
+        self::assertNotNull($circuitB);
         self::assertEquals(1, $circuitB->getFailureCount());
     }
 

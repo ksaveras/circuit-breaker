@@ -14,10 +14,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 class PsrCacheStorage extends AbstractStorage
 {
-    /**
-     * @var CacheItemPoolInterface
-     */
-    private $cache;
+    private CacheItemPoolInterface $cache;
 
     public function __construct(CacheItemPoolInterface $cache)
     {

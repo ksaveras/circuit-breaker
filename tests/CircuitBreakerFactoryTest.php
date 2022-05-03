@@ -39,12 +39,12 @@ class CircuitBreakerFactoryTest extends TestCase
         ]];
 
         yield [[
-            'reset_timeout_ms' => 4000,
+            'reset_timeout' => 4000,
         ]];
 
         yield [[
-            'reset_timeout_ms' => 4000,
-            'maximum_timeout_ms' => 50000,
+            'reset_timeout' => 4000,
+            'maximum_timeout' => 50000,
         ]];
 
         yield [[

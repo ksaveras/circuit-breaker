@@ -24,7 +24,7 @@ $factory = new CircuitBreakerFactory(
     [
         'failure_threshold' => 3,
         'retry_policy' => 'exponential',
-        'reset_timeout_ms' => 300,
+        'reset_timeout' => 300,
     ],
     new ApcuStorage()
 );
@@ -52,7 +52,7 @@ $factory = new CircuitBreakerFactory(
     [
         'failure_threshold' => 3,
         'retry_policy' => 'exponential',
-        'reset_timeout_ms' => 300,
+        'reset_timeout' => 300,
     ],
     new ApcuStorage()
 );

@@ -16,15 +16,12 @@ use PHPUnit\Framework\TestCase;
 
 class RedisStorageTest extends TestCase
 {
-    /**
-     * @var RedisStorage
-     */
-    private $storage;
+    private RedisStorage $storage;
 
     /**
      * @var MockObject&\Redis
      */
-    private $client;
+    private MockObject $client;
 
     protected function setUp(): void
     {
@@ -62,7 +59,7 @@ class RedisStorageTest extends TestCase
             ->willReturn($circuitData);
 
         $circuit = $this->storage->getCircuit('myApi');
-
+        self::assertNotNull($circuit);
         self::assertEquals($circuitData, $circuit->toArray());
     }
 

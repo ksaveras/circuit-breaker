@@ -14,9 +14,9 @@ use Ksaveras\CircuitBreaker\Circuit;
 class InMemoryStorage extends AbstractStorage
 {
     /**
-     * @var Circuit[]|array
+     * @var array<string, Circuit>
      */
-    private $circuits = [];
+    private array $circuits = [];
 
     public function getCircuit(string $name): ?Circuit
     {

@@ -13,10 +13,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 class ConstantRetryPolicy implements RetryPolicyInterface
 {
-    /**
-     * @var int
-     */
-    private $timeout;
+    private int $timeout;
 
     public function __construct(int $timeout = 600)
     {

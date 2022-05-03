@@ -13,10 +13,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 class RedisStorage extends AbstractStorage
 {
-    /**
-     * @var \Redis
-     */
-    protected $client;
+    protected \Redis $client;
 
     public function __construct(\Redis $client)
     {
