@@ -16,7 +16,7 @@ final class Circuit
 {
     private string $name;
 
-    private ?int $failureCount;
+    private int $failureCount;
 
     private ?int $lastFailure;
 
