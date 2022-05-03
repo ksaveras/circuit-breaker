@@ -43,7 +43,7 @@
     "scripts": {
         "phpcsfix": "@php ./vendor/bin/php-cs-fixer fix",
         "phpcscheck": "@php ./vendor/bin/php-cs-fixer fix --dry-run --diff",
-        "phpstan": "@php ./vendor/bin/phpstan analyse src tests",
+        "phpstan": "@php ./vendor/bin/phpstan analyse",
         "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit"
     },
     "config": {

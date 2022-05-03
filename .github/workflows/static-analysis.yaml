@@ -1,4 +1,4 @@
-name: "Coding Standards"
+name: "Static Analysis"
 
 on:
   pull_request:
@@ -6,8 +6,8 @@ on:
       - "master"
 
 jobs:
-  coding-standards:
-    name: "Coding Standards"
+  static-analysis:
+    name: "Static Analysis"
     runs-on: "ubuntu-20.04"
 
     steps:
@@ -21,12 +21,12 @@ jobs:
         with:
           php-version: "7.4"
           extensions: "redis"
-          tools: "composer:v2,cs2pr"
+          tools: "composer:v2"
 
       - name: "Install dependencies with Composer"
         uses: "ramsey/composer-install@v2"
         with:
           composer-options: "--prefer-dist --optimize-autoloader"
 
-      - name: "Check code style"
-        run: "./vendor/bin/php-cs-fixer fix --dry-run --format=checkstyle | cs2pr"
+      - name: "Run PHPStan"
+        run: "./vendor/bin/phpstan analyse --error-format=github"
