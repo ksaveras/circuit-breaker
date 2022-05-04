@@ -23,8 +23,12 @@ use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
 $factory = new CircuitBreakerFactory(
     [
         'failure_threshold' => 3,
-        'retry_policy' => 'exponential',
-        'reset_timeout' => 300,
+        'retry_policy' => [
+            'type' => 'exponential',
+            'options' => [
+                'reset_timeout' => 300,
+            ],
+        ],
     ],
     new ApcuStorage()
 );
@@ -51,8 +55,12 @@ use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
 $factory = new CircuitBreakerFactory(
     [
         'failure_threshold' => 3,
-        'retry_policy' => 'exponential',
-        'reset_timeout' => 300,
+        'retry_policy' => [
+            'type' => 'exponential',
+            'options' => [
+                'reset_timeout' => 300,
+            ],
+        ],
     ],
     new ApcuStorage()
 );
