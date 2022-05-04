@@ -33,17 +33,25 @@ final class CircuitBreakerFactory
 
     protected static function configureOptions(OptionsResolver $options): void
     {
-        $options->setRequired(['failure_threshold', 'retry_policy', 'reset_timeout', 'maximum_timeout']);
+        $options->setRequired(['failure_threshold', 'retry_policy']);
         $options->setAllowedTypes('failure_threshold', 'int');
-        $options->setAllowedTypes('reset_timeout', 'int');
-        $options->setAllowedTypes('maximum_timeout', 'int');
-        $options->setAllowedValues('retry_policy', ['constant', 'exponential', 'linear']);
 
         $options->setDefaults([
             'failure_threshold' => 5,
-            'retry_policy' => 'exponential',
-            'reset_timeout' => 60,
-            'maximum_timeout' => 86400,
+            'retry_policy' => function (OptionsResolver $policyResolver) {
+                $policyResolver->setDefaults([
+                    'type' => 'exponential',
+                    'options' => function (OptionsResolver $optionsResolver) {
+                        $optionsResolver->setDefaults([
+                            'reset_timeout' => 60,
+                            'maximum_timeout' => 86400,
+                        ]);
+                        $optionsResolver->setAllowedTypes('reset_timeout', 'int');
+                        $optionsResolver->setAllowedTypes('maximum_timeout', 'int');
+                    },
+                ]);
+                $policyResolver->setAllowedValues('type', ['constant', 'exponential', 'linear']);
+            }
         ]);
     }
 
@@ -54,13 +62,15 @@ final class CircuitBreakerFactory
 
     private function createRetryPolicy(): RetryPolicyInterface
     {
-        switch ($this->config['retry_policy']) {
+        $options = $this->config['retry_policy']['options'];
+
+        switch ($this->config['retry_policy']['type']) {
             case 'constant':
-                return new ConstantRetryPolicy($this->config['reset_timeout']);
+                return new ConstantRetryPolicy($options['reset_timeout']);
             case 'exponential':
-                return new ExponentialRetryPolicy($this->config['reset_timeout'], $this->config['maximum_timeout']);
+                return new ExponentialRetryPolicy($options['reset_timeout'], $options['maximum_timeout']);
             case 'linear':
-                return new LinearRetryPolicy($this->config['reset_timeout']);
+                return new LinearRetryPolicy($options['reset_timeout']);
             default:
                 throw new \LogicException(sprintf('Retry policy "%s" does not exists, it must be one of "constant", "exponential", "linear".', $this->config['retry_policy']));
         }
