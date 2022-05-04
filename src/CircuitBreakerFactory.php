@@ -51,7 +51,7 @@ final class CircuitBreakerFactory
                     },
                 ]);
                 $policyResolver->setAllowedValues('type', ['constant', 'exponential', 'linear']);
-            }
+            },
         ]);
     }
 
