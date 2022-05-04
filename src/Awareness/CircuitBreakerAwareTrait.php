@@ -13,10 +13,7 @@ use Ksaveras\CircuitBreaker\CircuitBreaker;
 
 trait CircuitBreakerAwareTrait
 {
-    /**
-     * @var CircuitBreaker
-     */
-    private $circuitBreaker;
+    private ?CircuitBreaker $circuitBreaker = null;
 
     public function getCircuitBreaker(): CircuitBreaker
     {

@@ -39,33 +39,35 @@ class CircuitBreakerFactoryTest extends TestCase
         ]];
 
         yield [[
-            'reset_timeout_ms' => 4000,
+            'retry_policy' => ['options' => ['reset_timeout' => 4000]],
         ]];
 
         yield [[
-            'reset_timeout_ms' => 4000,
-            'maximum_timeout_ms' => 50000,
+            'retry_policy' => ['options' => [
+                'reset_timeout' => 4000,
+                'maximum_timeout' => 50000,
+            ]],
         ]];
 
         yield [[
-            'retry_policy' => 'constant',
+            'retry_policy' => ['type' => 'constant'],
         ]];
 
         yield [[
-            'retry_policy' => 'exponential',
+            'retry_policy' => ['type' => 'exponential'],
         ]];
 
         yield [[
-            'retry_policy' => 'linear',
+            'retry_policy' => ['type' => 'linear'],
         ]];
     }
 
     public function testInvalidRetryPolicy(): void
     {
         $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "retry_policy" with value "nonexistent" is invalid. Accepted values are: "constant", "exponential", "linear".');
+        $this->expectExceptionMessage('The option "type" with value "nonexistent" is invalid. Accepted values are: "constant", "exponential", "linear".');
 
-        $factory = new CircuitBreakerFactory(['retry_policy' => 'nonexistent'], new InMemoryStorage());
+        $factory = new CircuitBreakerFactory(['retry_policy' => ['type' => 'nonexistent']], new InMemoryStorage());
 
         $factory->create('name');
     }

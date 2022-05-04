@@ -16,25 +16,13 @@ use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
 class CircuitBreaker
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var int
-     */
-    private $failureThreshold;
+    private int $failureThreshold;
 
-    /**
-     * @var RetryPolicyInterface
-     */
-    private $retryPolicy;
+    private RetryPolicyInterface $retryPolicy;
 
-    /**
-     * @var StorageInterface
-     */
-    private $storage;
+    private StorageInterface $storage;
 
     public function __construct(
         string $name,

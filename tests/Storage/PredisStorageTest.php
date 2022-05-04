@@ -17,15 +17,12 @@ use Predis\ClientInterface;
 
 class PredisStorageTest extends TestCase
 {
-    /**
-     * @var PredisStorage
-     */
-    private $storage;
+    private PredisStorage $storage;
 
     /**
      * @var MockObject&ClientInterface
      */
-    private $client;
+    private MockObject $client;
 
     protected function setUp(): void
     {
@@ -63,7 +60,7 @@ class PredisStorageTest extends TestCase
             ->willReturn($circuitData);
 
         $circuit = $this->storage->getCircuit('myApi');
-
+        self::assertNotNull($circuit);
         self::assertEquals($circuitData, $circuit->toArray());
     }
 

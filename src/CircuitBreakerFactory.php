@@ -9,7 +9,6 @@
  */
 namespace Ksaveras\CircuitBreaker;
 
-use Ksaveras\CircuitBreaker\Factory\CircuitFactory;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
 use Ksaveras\CircuitBreaker\Policy\LinearRetryPolicy;
@@ -19,15 +18,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 final class CircuitBreakerFactory
 {
-    /**
-     * @var array
-     */
-    private $config;
+    private array $config;
 
-    /**
-     * @var StorageInterface
-     */
-    private $storage;
+    private StorageInterface $storage;
 
     public function __construct(array $config, StorageInterface $storage)
     {
@@ -40,17 +33,25 @@ final class CircuitBreakerFactory
 
     protected static function configureOptions(OptionsResolver $options): void
     {
-        $options->setRequired(['failure_threshold', 'retry_policy', 'reset_timeout_ms', 'maximum_timeout_ms']);
+        $options->setRequired(['failure_threshold', 'retry_policy']);
         $options->setAllowedTypes('failure_threshold', 'int');
-        $options->setAllowedTypes('reset_timeout_ms', 'int');
-        $options->setAllowedTypes('maximum_timeout_ms', 'int');
-        $options->setAllowedValues('retry_policy', ['constant', 'exponential', 'linear']);
 
         $options->setDefaults([
             'failure_threshold' => 5,
-            'retry_policy' => 'exponential',
-            'reset_timeout_ms' => 600,
-            'maximum_timeout_ms' => 86400,
+            'retry_policy' => function (OptionsResolver $policyResolver) {
+                $policyResolver->setDefaults([
+                    'type' => 'exponential',
+                    'options' => function (OptionsResolver $optionsResolver) {
+                        $optionsResolver->setDefaults([
+                            'reset_timeout' => 60,
+                            'maximum_timeout' => 86400,
+                        ]);
+                        $optionsResolver->setAllowedTypes('reset_timeout', 'int');
+                        $optionsResolver->setAllowedTypes('maximum_timeout', 'int');
+                    },
+                ]);
+                $policyResolver->setAllowedValues('type', ['constant', 'exponential', 'linear']);
+            },
         ]);
     }
 
@@ -61,13 +62,15 @@ final class CircuitBreakerFactory
 
     private function createRetryPolicy(): RetryPolicyInterface
     {
-        switch ($this->config['retry_policy']) {
+        $options = $this->config['retry_policy']['options'];
+
+        switch ($this->config['retry_policy']['type']) {
             case 'constant':
-                return new ConstantRetryPolicy($this->config['reset_timeout_ms']);
+                return new ConstantRetryPolicy($options['reset_timeout']);
             case 'exponential':
-                return new ExponentialRetryPolicy($this->config['reset_timeout_ms'], $this->config['maximum_timeout_ms']);
+                return new ExponentialRetryPolicy($options['reset_timeout'], $options['maximum_timeout']);
             case 'linear':
-                return new LinearRetryPolicy($this->config['reset_timeout_ms']);
+                return new LinearRetryPolicy($options['reset_timeout']);
             default:
                 throw new \LogicException(sprintf('Retry policy "%s" does not exists, it must be one of "constant", "exponential", "linear".', $this->config['retry_policy']));
         }

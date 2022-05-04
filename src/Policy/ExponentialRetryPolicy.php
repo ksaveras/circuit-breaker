@@ -13,20 +13,11 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 class ExponentialRetryPolicy implements RetryPolicyInterface
 {
-    /**
-     * @var int
-     */
-    private $initialTimeout;
+    private int $initialTimeout;
 
-    /**
-     * @var int
-     */
-    private $base;
+    private int $base;
 
-    /**
-     * @var int
-     */
-    private $maximum;
+    private int $maximum;
 
     public function __construct(int $initialTimeout = 600, int $maximum = 86400, int $base = 2)
     {
