@@ -48,7 +48,7 @@ jobs:
           composer-options: "--prefer-dist --optimize-autoloader"
 
       - name: "Run PHPUnit"
-        run: "./vendor/bin/phpunit --coverage-clover=coverage.xml"
+        run: "./vendor/bin/phpunit --coverage-clover=clover.xml"
 
       - name: "Upload coverage file"
         uses: "actions/upload-artifact@v2"
@@ -84,4 +84,4 @@ jobs:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
           debug: true
-          coverageLocations: ${{github.workspace}}/reports/coverage.xml:clover
+          coverageLocations: ${{github.workspace}}/*.xml:clover
