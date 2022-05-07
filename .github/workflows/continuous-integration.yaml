@@ -83,5 +83,5 @@ jobs:
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
-          coverageLocations: |
-            ${{github.workspace}}/reports/coverage.xml:clover
+          debug: true
+          coverageLocations: ${{github.workspace}}/reports/*.xml:clover
