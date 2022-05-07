@@ -48,4 +48,37 @@ jobs:
           composer-options: "--prefer-dist --optimize-autoloader"
 
       - name: "Run PHPUnit"
-        run: "./vendor/bin/phpunit"
+        run: "./vendor/bin/phpunit --coverage-clover=coverage.xml"
+
+      - name: "Upload coverage file"
+        uses: "actions/upload-artifact@v2"
+        with:
+          name: "phpunit-${{ matrix.php-version }}-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}.coverage"
+          path: "coverage.xml"
+
+  upload_coverage:
+    name: "Upload coverage to Codecov"
+    runs-on: "ubuntu-latest"
+    needs:
+      - "phpunit"
+
+    steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+        with:
+          fetch-depth: 2
+
+      - name: "Download coverage files"
+        uses: "actions/download-artifact@v2"
+        with:
+          path: "reports"
+
+      - name: "Upload to Codecov"
+        uses: "codecov/codecov-action@v1"
+        with:
+          directory: reports
+
+      - name: "Upload to CodeClimate"
+        uses: "paambaati/codeclimate-action@v2.2.4"
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
