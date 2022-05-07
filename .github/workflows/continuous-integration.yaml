@@ -54,7 +54,7 @@ jobs:
         uses: "actions/upload-artifact@v2"
         with:
           name: "phpunit-${{ matrix.php-version }}-${{ matrix.dependencies }}-${{ hashFiles('composer.lock') }}.coverage"
-          path: "coverage.xml"
+          path: "clover.xml"
 
   upload_coverage:
     name: "Upload coverage to Codecov"
