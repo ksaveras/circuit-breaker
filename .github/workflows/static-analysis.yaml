@@ -5,6 +5,11 @@ on:
     branches:
       - "main"
 
+  push:
+    branches:
+      - "main"
+      - "*.x"
+
 jobs:
   static-analysis:
     name: "Static Analysis"

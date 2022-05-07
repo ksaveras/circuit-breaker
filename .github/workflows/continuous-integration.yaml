@@ -5,6 +5,11 @@ on:
     branches:
       - "main"
 
+  push:
+    branches:
+      - "main"
+      - "*.x"
+
 jobs:
   phpunit:
     name: "PHPUnit"
@@ -73,16 +78,15 @@ jobs:
         with:
           path: "reports"
 
-#      - name: "Upload to Codecov"
-#        uses: "codecov/codecov-action@v1"
-#        with:
-#          directory: reports
+      - name: "Upload to Codecov"
+        uses: "codecov/codecov-action@v1"
+        with:
+          directory: reports
 
       - name: "Upload to CodeClimate"
         uses: "paambaati/codeclimate-action@v3.0.0"
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
         with:
-          debug: true
           coverageLocations: |
             ${{github.workspace}}/reports/*/clover.xml:clover
