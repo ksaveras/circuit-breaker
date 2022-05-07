@@ -85,6 +85,4 @@ jobs:
         with:
           debug: true
           coverageLocations: |
-            ${{github.workspace}}/reports/*.xml:clover
-          coverageLocationsParam: |
-            ${{github.workspace}}/reports/*.xml:clover
+            reports/*:clover
