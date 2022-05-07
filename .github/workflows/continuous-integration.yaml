@@ -73,10 +73,10 @@ jobs:
         with:
           path: "reports"
 
-      - name: "Upload to Codecov"
-        uses: "codecov/codecov-action@v1"
-        with:
-          directory: reports
+#      - name: "Upload to Codecov"
+#        uses: "codecov/codecov-action@v1"
+#        with:
+#          directory: reports
 
       - name: "Upload to CodeClimate"
         uses: "paambaati/codeclimate-action@v3.0.0"
@@ -85,4 +85,4 @@ jobs:
         with:
           debug: true
           coverageLocations: |
-            ${{github.workspace}}/reports/clover.xml:clover
+            ${{github.workspace}}/reports/*/clover.xml:clover
