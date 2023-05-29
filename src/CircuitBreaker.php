@@ -63,7 +63,7 @@ class CircuitBreaker
             case State::HALF_OPEN:
                 try {
                     $result = $closure();
-                    if (0 === $circuit->getFailureCount()) {
+                    if (0 !== $circuit->getFailureCount()) {
                         $this->success();
                     }
 

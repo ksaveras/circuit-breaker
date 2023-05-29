@@ -16,8 +16,6 @@ class CircuitBuilder
 {
     private string $name = 'demo';
 
-    private string $state = State::OPEN;
-
     private int $failureCount = 3;
 
     /**
@@ -42,13 +40,6 @@ class CircuitBuilder
     public function withName(string $name): self
     {
         $this->name = $name;
-
-        return $this;
-    }
-
-    public function withState(string $state): self
-    {
-        $this->state = $state;
 
         return $this;
     }
