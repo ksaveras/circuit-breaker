@@ -7,20 +7,11 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
+
 namespace Ksaveras\CircuitBreaker;
 
-use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 
-/**
- * @phpstan-type CircuitArray array{
- *      name: string,
- *      failureCount?: int,
- *      failureThreshold?: int,
- *      lastFailure?: int|null,
- *      resetTimeout?: int
- * }
- */
 final class Circuit
 {
     private string $name;
@@ -47,21 +38,9 @@ final class Circuit
         $this->resetTimeout = $resetTimeout;
     }
 
-    /**
-     * @param array<string, string|int|null> $data
-     */
-    public static function fromArray(array $data): self
+    public function __toString(): string
     {
-        if (!isset($data['name']) || !\is_string($data['name'])) {
-            throw new CircuitBreakerException('Missing required data field "name"');
-        }
-
-        $failureCount = (int) ($data['failureCount'] ?? 0);
-        $failureThreshold = (int) ($data['failureThreshold'] ?? 5);
-        $lastFailure = isset($data['lastFailure']) ? (int) $data['lastFailure'] : null;
-        $resetTimeout = (int) ($data['resetTimeout'] ?? 60);
-
-        return new self($data['name'], $failureThreshold, $failureCount, $lastFailure, $resetTimeout);
+        return $this->name;
     }
 
     public function getName(): string
@@ -75,7 +54,7 @@ final class Circuit
             return State::CLOSED;
         }
 
-        return (time() - $this->getLastFailure()) > $this->getResetTimeout() ? State::HALF_OPEN : State::OPEN;
+        return (time() - $this->getLastFailure()) > $this->getExpirationTime() ? State::HALF_OPEN : State::OPEN;
     }
 
     public function getFailureCount(): int
@@ -105,23 +84,29 @@ final class Circuit
         return $this->resetTimeout;
     }
 
+    public function getExpirationTime(): int
+    {
+        return time() + $this->resetTimeout;
+    }
+
     public function reset(): void
     {
         $this->failureCount = 0;
         $this->lastFailure = null;
     }
 
-    /**
-     * @return array<string, string|int|null>
-     */
-    public function toArray(): array
+    public function __serialize(): array
     {
         return [
-            'name' => $this->name,
-            'failureCount' => $this->failureCount,
-            'failureThreshold' => $this->failureThreshold,
-            'lastFailure' => $this->lastFailure,
-            'resetTimeout' => $this->resetTimeout,
+            $this->name => $this->lastFailure,
+            pack('NN', $this->failureCount, $this->failureThreshold) => $this->resetTimeout,
         ];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        [$this->lastFailure, $this->resetTimeout] = array_values($data);
+        [$this->name, $pack] = array_keys($data);
+        ['a' => $this->failureCount, 'b' => $this->failureThreshold] = unpack('Na/Nb', $pack);
     }
 }

@@ -11,24 +11,40 @@ namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-final class InMemoryStorage extends AbstractStorage
+final class InMemoryStorage implements StorageInterface
 {
     /**
-     * @var array<string, Circuit>
+     * @var array<string, array<int, int|string>>
      */
     private array $circuits = [];
 
-    public function getCircuit(string $name): ?Circuit
+    public function save(Circuit $circuit): void
     {
-        return $this->circuits[$name] ?? null;
+        $this->circuits[$circuit->getName()] = [$circuit->getExpirationTime(), serialize($circuit)];
     }
 
-    public function saveCircuit(Circuit $circuit): void
+    public function fetch(string $name): ?Circuit
     {
-        $this->circuits[$circuit->getName()] = $circuit;
+        if (!isset($this->circuits[$name])) {
+            return null;
+        }
+
+        [$expiresAt, $circuitState] = $this->circuits[$name];
+        if (null !== $expiresAt && $expiresAt <= microtime(true)) {
+            unset($this->circuits[$name]);
+
+            return null;
+        }
+
+        $circuit = unserialize($circuitState, ['allowed_classes' => [Circuit::class]]);
+        if ($circuit instanceof Circuit) {
+            return $circuit;
+        }
+
+        return null;
     }
 
-    public function resetCircuit(string $name): void
+    public function delete(string $name): void
     {
         unset($this->circuits[$name]);
     }

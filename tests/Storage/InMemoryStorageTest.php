@@ -21,17 +21,20 @@ final class InMemoryStorageTest extends TestCase
         $storage = new InMemoryStorage();
         $policy = new ConstantRetryPolicy();
 
-        $storage->saveCircuit(new Circuit('demo1'));
+        $storage->save(new Circuit('demo1'));
 
-        $circuit = $storage->getCircuit('demo1');
+        $circuit = $storage->fetch('demo1');
         self::assertNotNull($circuit);
         self::assertEquals(0, $circuit->getFailureCount());
 
         $circuit->increaseFailure($policy);
-        $storage->saveCircuit($circuit);
+        $storage->save($circuit);
 
-        $circuit = $storage->getCircuit('demo1');
+        $circuit = $storage->fetch('demo1');
         self::assertNotNull($circuit);
         self::assertEquals(1, $circuit->getFailureCount());
+
+        $storage->delete('demo1');
+        self::assertNull($storage->fetch('demo1'));
     }
 }

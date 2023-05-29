@@ -75,14 +75,12 @@ final class CircuitBuilder
 
     public function build(): Circuit
     {
-        return Circuit::fromArray(
-            [
-                'name' => $this->name,
-                'failureThreshold' => $this->failureThreshold,
-                'failureCount' => $this->failureCount,
-                'lastFailure' => $this->lastFailure,
-                'resetTimeout' => $this->resetTimeout,
-            ]
+        return new Circuit(
+            $this->name,
+            $this->failureThreshold,
+            $this->failureCount,
+            $this->lastFailure,
+            $this->resetTimeout
         );
     }
 }
