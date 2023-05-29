@@ -13,6 +13,7 @@ jobs:
     env:
       COMPOSER_NO_INTERACTION: 1
 
+    name: Code Coverage Report
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -54,4 +55,3 @@ jobs:
           file: coverage/clover.xml
           base-file: coverage/base/clover.xml
           with-chart: false
-
