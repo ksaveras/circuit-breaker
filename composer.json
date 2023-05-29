@@ -1,6 +1,7 @@
 {
     "name": "ksaveras/circuit-breaker",
     "type": "library",
+    "version": "v1.0.0",
     "description": "Circuit Breaker library",
     "keywords": ["circuit breaker", "graceful", "error handling", "fault tolerance", "microservices"],
     "license": "MIT",
