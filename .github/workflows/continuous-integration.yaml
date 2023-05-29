@@ -3,49 +3,50 @@ name: "Continuous Integration"
 on:
   pull_request:
     branches:
-      - "main"
+      - main
 
 jobs:
   phpunit:
     name: "PHPUnit"
-    runs-on: "ubuntu-latest"
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         php-version:
-          - "7.4"
-          - "8.0"
-          - "8.1"
+          - 7.4
+          - 8.0
+          - 8.1
+          - 8.2
         dependencies:
-          - "highest"
+          - highest
         stability:
-          - "stable"
+          - stable
 
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2"
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
           fetch-depth: 2
 
-      - name: "Install PHP with PCOV"
-        uses: "shivammathur/setup-php@v2"
+      - name: Install PHP with PCOV
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: "${{ matrix.php-version }}"
-          coverage: "pcov"
+          php-version: ${{ matrix.php-version }}
+          coverage: pcov
           ini-values: "zend.assertions=1, apc.enable_cli=1"
-          extensions: "redis,apcu"
-          tools: "composer:v2,flex"
+          extensions: redis,apcu
+          tools: composer:v2,flex
 
-      - name: "Enforce using stable dependencies"
-        run: "composer config minimum-stability stable"
-        if: "${{ matrix.stability == 'stable' }}"
+      - name: Enforce using stable dependencies
+        run: composer config minimum-stability stable
+        if: ${{ matrix.stability == 'stable' }}
 
-      - name: "Install dependencies with Composer"
-        uses: "ramsey/composer-install@v2"
+      - name: Install dependencies with Composer
+        uses: ramsey/composer-install@v2
         with:
-          dependency-versions: "${{ matrix.dependencies }}"
+          dependency-versions: ${{ matrix.dependencies }}
           composer-options: "--prefer-dist --optimize-autoloader"
 
-      - name: "Run PHPUnit"
-        run: "./vendor/bin/phpunit"
+      - name: Run PHPUnit
+        run: composer test
