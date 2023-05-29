@@ -14,44 +14,24 @@ use Ksaveras\CircuitBreaker\State;
 
 class CircuitBuilder
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name = 'demo';
 
-    /**
-     * @var string
-     */
-    private $state;
+    private string $state = State::OPEN;
 
-    /**
-     * @var int
-     */
-    private $failureCount;
+    private int $failureCount = 3;
 
     /**
      * @var int
      */
     private $lastFailure;
 
-    /**
-     * @var int
-     */
-    private $failureThreshold;
+    private int $failureThreshold = 2;
 
-    /**
-     * @var int
-     */
-    private $resetTimeout;
+    private int $resetTimeout = 120;
 
     private function __construct()
     {
-        $this->name = 'demo';
-        $this->state = State::OPEN;
-        $this->failureCount = 3;
         $this->lastFailure = time();
-        $this->failureThreshold = 2;
-        $this->resetTimeout = 120;
     }
 
     public static function builder(): self
