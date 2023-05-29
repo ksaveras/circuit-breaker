@@ -53,3 +53,5 @@ jobs:
         with:
           file: coverage/clover.xml
           base-file: coverage/base/clover.xml
+          with-chart: false
+
