@@ -44,7 +44,8 @@
         "phpcsfix": "@php ./vendor/bin/php-cs-fixer fix",
         "phpcscheck": "@php ./vendor/bin/php-cs-fixer fix --dry-run --diff",
         "phpstan": "@php ./vendor/bin/phpstan analyse",
-        "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit"
+        "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit",
+        "test:coverage": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit --coverage-clover=coverage/clover.xml"
     },
     "config": {
         "sort-packages": true,

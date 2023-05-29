@@ -30,6 +30,9 @@ class ApcuStorageTest extends TestCase
         if (!\function_exists('apcu_store')) {
             self::markTestSkipped('Missing apcu extension');
         }
+        if (!apcu_enabled()) {
+            self::markTestSkipped('APCu is not enabled');
+        }
 
         $circuit = CircuitBuilder::builder()
             ->withName('demo')
