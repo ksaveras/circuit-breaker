@@ -96,7 +96,7 @@ final class CacheStorageTest extends TestCase
             ->with($circuit);
         $cacheItem->expects(self::once())
             ->method('expiresAfter')
-            ->with(self::isType('int'));
+            ->with(120);
 
         $this->pool->expects(self::once())
             ->method('getItem')

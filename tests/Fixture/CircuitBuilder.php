@@ -17,7 +17,7 @@ final class CircuitBuilder
 
     private int $failureCount = 3;
 
-    private int $lastFailure;
+    private ?float $lastFailure = null;
 
     private int $failureThreshold = 2;
 
@@ -25,7 +25,6 @@ final class CircuitBuilder
 
     private function __construct()
     {
-        $this->lastFailure = time();
     }
 
     public static function new(): self
@@ -49,7 +48,7 @@ final class CircuitBuilder
         return $builder;
     }
 
-    public function withLastFailure(int $lastFailure): self
+    public function withLastFailure(float $lastFailure): self
     {
         $builder = clone $this;
         $builder->lastFailure = $lastFailure;

@@ -18,7 +18,7 @@ final class Circuit
 
     private int $failureCount;
 
-    private ?int $lastFailure;
+    private ?float $lastFailure;
 
     private int $failureThreshold;
 
@@ -28,7 +28,7 @@ final class Circuit
         string $name,
         int $failureThreshold = 5,
         int $failureCount = 0,
-        int $lastFailure = null,
+        ?float $lastFailure = null,
         int $resetTimeout = 60
     ) {
         $this->name = $name;
@@ -54,7 +54,7 @@ final class Circuit
             return State::CLOSED;
         }
 
-        return (time() - $this->getLastFailure()) > $this->getExpirationTime() ? State::HALF_OPEN : State::OPEN;
+        return (microtime(true) - $this->getLastFailure()) > $this->getExpirationTime() ? State::HALF_OPEN : State::OPEN;
     }
 
     public function getFailureCount(): int
@@ -74,7 +74,7 @@ final class Circuit
         return $this->failureThreshold;
     }
 
-    public function getLastFailure(): ?int
+    public function getLastFailure(): ?float
     {
         return $this->lastFailure;
     }

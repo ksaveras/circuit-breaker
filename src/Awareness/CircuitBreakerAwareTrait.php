@@ -24,10 +24,8 @@ trait CircuitBreakerAwareTrait
         return $this->circuitBreaker;
     }
 
-    public function setCircuitBreaker(CircuitBreaker $circuitBreaker): self
+    public function setCircuitBreaker(CircuitBreaker $circuitBreaker): void
     {
         $this->circuitBreaker = $circuitBreaker;
-
-        return $this;
     }
 }

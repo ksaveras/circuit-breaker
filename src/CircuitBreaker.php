@@ -11,7 +11,6 @@ namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
-use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
 final class CircuitBreaker
@@ -30,7 +29,7 @@ final class CircuitBreaker
         RetryPolicyInterface $retryPolicy,
         StorageInterface $storage
     ) {
-        $this->name = AbstractStorage::validateKey($name);
+        $this->name = $name;
         $this->failureThreshold = $failureThreshold;
         $this->retryPolicy = $retryPolicy;
         $this->storage = $storage;
@@ -87,19 +86,19 @@ final class CircuitBreaker
 
     public function success(): void
     {
-        $this->storage->resetCircuit($this->name);
+        $this->storage->delete($this->name);
     }
 
     public function failure(): void
     {
         $circuit = $this->getCircuit();
         $circuit->increaseFailure($this->retryPolicy);
-        $this->storage->saveCircuit($circuit);
+        $this->storage->save($circuit);
     }
 
     protected function getCircuit(): Circuit
     {
-        if (null === $circuit = $this->storage->getCircuit($this->name)) {
+        if (null === $circuit = $this->storage->fetch($this->name)) {
             $circuit = new Circuit($this->name, $this->failureThreshold);
         }
 

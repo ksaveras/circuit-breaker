@@ -25,7 +25,12 @@ final class CircuitBreakerTest extends TestCase
     {
         parent::setUp();
 
-        $this->service = new CircuitBreaker('demo', 2, new ConstantRetryPolicy(50), new InMemoryStorage());
+        $this->service = new CircuitBreaker(
+            'demo',
+            2,
+            new ConstantRetryPolicy(50),
+            new InMemoryStorage()
+        );
     }
 
     public function testReturnsName(): void
@@ -86,6 +91,7 @@ final class CircuitBreakerTest extends TestCase
     {
         ClockMock::register(__CLASS__);
         ClockMock::register(CircuitBreaker::class);
+        ClockMock::register(InMemoryStorage::class);
         ClockMock::withClockMock(true);
 
         try {
