@@ -1,0 +1,57 @@
+name: Code Coverage
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  php-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      COMPOSER_NO_INTERACTION: 1
+
+    name: Code Coverage Report
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.2
+          coverage: pcov
+          ini-values: "zend.assertions=1, apc.enable_cli=1"
+          extensions: redis,apcu
+          tools: composer:v2,flex
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Execute Unit Tests
+        run: composer test:coverage
+
+      - if: ${{ github.event_name == 'pull_request' }}
+        name: Download artifact
+        uses: dawidd6/action-download-artifact@v2
+        continue-on-error: true
+        with:
+          workflow: .github/workflows/coverage-report.yaml # this file
+          branch: main
+          name: coverage-report
+          path: coverage/base
+
+      - if: ${{ github.event_name != 'pull_request' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-report
+          path: coverage/clover.xml
+
+      - name: Coverage Report as Comment (Clover)
+        uses: lucassabreu/comment-coverage-clover@main
+        with:
+          file: coverage/clover.xml
+          base-file: coverage/base/clover.xml
+          with-chart: false
