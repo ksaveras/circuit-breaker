@@ -16,17 +16,43 @@ use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+/**
+ * @phpstan-type CircuitBreakerConfig array{
+ *      failure_threshold?: int,
+ *      retry_policy?: array{
+ *          type?: string,
+ *          options?: array{reset_timeout?: int, maximum_timeout?: int}
+ *      }
+ * }
+ * @phpstan-type CircuitBreakerParsedConfig array{
+ *     failure_threshold: int,
+ *     retry_policy: array{
+ *         type: string,
+ *         options: array{
+ *             reset_timeout: int,
+ *             maximum_timeout: int
+ *         }
+ *     }
+ * }
+ */
 final class CircuitBreakerFactory
 {
+    /**
+     * @var CircuitBreakerParsedConfig
+     */
     private array $config;
 
     private StorageInterface $storage;
 
+    /**
+     * @param CircuitBreakerConfig $config
+     */
     public function __construct(array $config, StorageInterface $storage)
     {
         $options = new OptionsResolver();
         self::configureOptions($options);
 
+        /* @phpstan-ignore-next-line */
         $this->config = $options->resolve($config);
         $this->storage = $storage;
     }
@@ -72,7 +98,7 @@ final class CircuitBreakerFactory
             case 'linear':
                 return new LinearRetryPolicy($options['reset_timeout']);
             default:
-                throw new \LogicException(sprintf('Retry policy "%s" does not exists, it must be one of "constant", "exponential", "linear".', $this->config['retry_policy']));
+                throw new \LogicException(sprintf('Retry policy "%s" does not exists, it must be one of "constant", "exponential", "linear".', $this->config['retry_policy']['type']));
         }
     }
 }

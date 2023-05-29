@@ -12,13 +12,15 @@ namespace Ksaveras\CircuitBreaker\Tests\Awareness;
 use Ksaveras\CircuitBreaker\Awareness\CircuitBreakerAwareInterface;
 use Ksaveras\CircuitBreaker\Awareness\CircuitBreakerAwareTrait;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
+use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
+use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
 
 final class CircuitBreakerAwareTraitTest extends TestCase
 {
     public function testTraitMethods(): void
     {
-        $circuitBreaker = $this->createMock(CircuitBreaker::class);
+        $circuitBreaker = new CircuitBreaker('demo', 3, new ConstantRetryPolicy(), new InMemoryStorage());
 
         $service = new MockObject();
 

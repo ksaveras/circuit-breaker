@@ -10,7 +10,6 @@
 namespace Ksaveras\CircuitBreaker\Tests\Fixture;
 
 use Ksaveras\CircuitBreaker\Circuit;
-use Ksaveras\CircuitBreaker\State;
 
 final class CircuitBuilder
 {
@@ -22,7 +21,7 @@ final class CircuitBuilder
 
     private int $failureThreshold = 2;
 
-    private int $resetTimeout= 120;
+    private int $resetTimeout = 120;
 
     private function __construct()
     {

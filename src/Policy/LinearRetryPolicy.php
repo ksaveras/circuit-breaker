@@ -11,7 +11,7 @@ namespace Ksaveras\CircuitBreaker\Policy;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class LinearRetryPolicy implements RetryPolicyInterface
+final class LinearRetryPolicy implements RetryPolicyInterface
 {
     private int $initialTimeout;
 

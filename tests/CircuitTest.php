@@ -76,7 +76,6 @@ final class CircuitTest extends TestCase
         $this->expectException(CircuitBreakerException::class);
         $this->expectExceptionMessage('Missing required data field "name"');
 
-        /* @phpstan-ignore-next-line */
         Circuit::fromArray([]);
     }
 

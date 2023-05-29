@@ -11,7 +11,7 @@ namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class InMemoryStorage extends AbstractStorage
+final class InMemoryStorage extends AbstractStorage
 {
     /**
      * @var array<string, Circuit>

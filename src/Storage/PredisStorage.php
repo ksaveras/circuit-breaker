@@ -12,7 +12,7 @@ namespace Ksaveras\CircuitBreaker\Storage;
 use Ksaveras\CircuitBreaker\Circuit;
 use Predis\ClientInterface;
 
-class PredisStorage extends AbstractStorage
+final class PredisStorage extends AbstractStorage
 {
     protected ClientInterface $client;
 

@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
-class CircuitBreaker
+final class CircuitBreaker
 {
     private string $name;
 

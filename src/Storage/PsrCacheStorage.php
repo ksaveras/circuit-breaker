@@ -12,7 +12,7 @@ namespace Ksaveras\CircuitBreaker\Storage;
 use Ksaveras\CircuitBreaker\Circuit;
 use Psr\Cache\CacheItemPoolInterface;
 
-class PsrCacheStorage extends AbstractStorage
+final class PsrCacheStorage extends AbstractStorage
 {
     private CacheItemPoolInterface $cache;
 
@@ -28,7 +28,12 @@ class PsrCacheStorage extends AbstractStorage
             return null;
         }
 
-        return Circuit::fromArray($item->get());
+        $data = $item->get();
+        if (!\is_array($data)) {
+            return null;
+        }
+
+        return Circuit::fromArray($data);
     }
 
     public function saveCircuit(Circuit $circuit): void

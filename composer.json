@@ -18,7 +18,7 @@
         "friendsofphp/php-cs-fixer": "^3.0",
         "phpstan/phpstan": "^1.10",
         "phpstan/phpstan-phpunit": "^1.3",
-        "phpunit/phpunit": "^9.5",
+        "phpunit/phpunit": "^9.6",
         "predis/predis": "^1.1",
         "symfony/cache": "^4.4|^5.0|^6.0",
         "symfony/phpunit-bridge": "^4.4|^5.0|^6.0"
@@ -41,11 +41,12 @@
         "symfony/cache": "Allows storing circuit breaker data using Symfony Cache Component"
     },
     "scripts": {
-        "phpcsfix": "@php ./vendor/bin/php-cs-fixer fix",
-        "phpcscheck": "@php ./vendor/bin/php-cs-fixer fix --dry-run --diff",
+        "phpcs": "@php ./vendor/bin/php-cs-fixer fix --dry-run --diff",
+        "phpcs:fix": "@php ./vendor/bin/php-cs-fixer fix",
         "phpstan": "@php ./vendor/bin/phpstan analyse",
         "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit",
-        "test:coverage": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit --coverage-clover=coverage/clover.xml"
+        "test:coverage": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit --coverage-clover=coverage/clover.xml",
+        "static-analysis": ["@phpcs", "@phpstan"]
     },
     "config": {
         "sort-packages": true,

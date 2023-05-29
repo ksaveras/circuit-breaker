@@ -11,7 +11,7 @@ namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class RedisStorage extends AbstractStorage
+final class RedisStorage extends AbstractStorage
 {
     protected \Redis $client;
 

@@ -12,6 +12,15 @@ namespace Ksaveras\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 
+/**
+ * @phpstan-type CircuitArray array{
+ *      name: string,
+ *      failureCount?: int,
+ *      failureThreshold?: int,
+ *      lastFailure?: int|null,
+ *      resetTimeout?: int
+ * }
+ */
 final class Circuit
 {
     private string $name;
@@ -38,9 +47,12 @@ final class Circuit
         $this->resetTimeout = $resetTimeout;
     }
 
+    /**
+     * @param array<string, string|int|null> $data
+     */
     public static function fromArray(array $data): self
     {
-        if (!isset($data['name'])) {
+        if (!isset($data['name']) || !\is_string($data['name'])) {
             throw new CircuitBreakerException('Missing required data field "name"');
         }
 

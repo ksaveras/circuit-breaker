@@ -11,12 +11,12 @@ namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class ApcuStorage extends AbstractStorage
+final class ApcuStorage extends AbstractStorage
 {
     public function getCircuit(string $name): ?Circuit
     {
         $data = apcu_fetch(static::storageKey($name));
-        if (false === $data) {
+        if (false === $data || !\is_array($data)) {
             return null;
         }
 

@@ -16,20 +16,14 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
 /**
- * @phpstan-type ConfigArray array{
- *      failure_threshold?: int,
- *      retry_policy?: array{
- *          type?: string,
- *          options?: array{reset_timeout?: int, maximum_timeout?: int}
- *      }
- * }
+ * @phpstan-import-type CircuitBreakerConfig from CircuitBreakerFactory
  */
 final class CircuitBreakerFactoryTest extends TestCase
 {
     /**
      * @dataProvider factoryConfigProvider
      *
-     * @param ConfigArray $config
+     * @param CircuitBreakerConfig $config
      */
     public function testCreate(array $config): void
     {
@@ -43,7 +37,7 @@ final class CircuitBreakerFactoryTest extends TestCase
     }
 
     /**
-     * @return array<string, array<int, ConfigArray>>
+     * @return array<string, array<int, CircuitBreakerConfig>>
      */
     public function factoryConfigProvider(): iterable
     {

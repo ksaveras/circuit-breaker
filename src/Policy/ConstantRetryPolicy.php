@@ -11,7 +11,7 @@ namespace Ksaveras\CircuitBreaker\Policy;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class ConstantRetryPolicy implements RetryPolicyInterface
+final class ConstantRetryPolicy implements RetryPolicyInterface
 {
     private int $timeout;
 
