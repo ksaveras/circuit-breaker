@@ -12,93 +12,66 @@ namespace Ksaveras\CircuitBreaker\Tests\Fixture;
 use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\State;
 
-class CircuitBuilder
+final class CircuitBuilder
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name = 'CB item';
 
-    /**
-     * @var string
-     */
-    private $state;
+    private int $failureCount = 3;
 
-    /**
-     * @var int
-     */
-    private $failureCount;
+    private int $lastFailure;
 
-    /**
-     * @var int
-     */
-    private $lastFailure;
+    private int $failureThreshold = 2;
 
-    /**
-     * @var int
-     */
-    private $failureThreshold;
-
-    /**
-     * @var int
-     */
-    private $resetTimeout;
+    private int $resetTimeout= 120;
 
     private function __construct()
     {
-        $this->name = 'demo';
-        $this->state = State::OPEN;
-        $this->failureCount = 3;
         $this->lastFailure = time();
-        $this->failureThreshold = 2;
-        $this->resetTimeout = 120;
     }
 
-    public static function builder(): self
+    public static function new(): self
     {
         return new self();
     }
 
     public function withName(string $name): self
     {
-        $this->name = $name;
+        $builder = clone $this;
+        $builder->name = $name;
 
-        return $this;
-    }
-
-    public function withState(string $state): self
-    {
-        $this->state = $state;
-
-        return $this;
+        return $builder;
     }
 
     public function withFailureCount(int $failureCount): self
     {
-        $this->failureCount = $failureCount;
+        $builder = clone $this;
+        $builder->failureCount = $failureCount;
 
-        return $this;
+        return $builder;
     }
 
     public function withLastFailure(int $lastFailure): self
     {
-        $this->lastFailure = $lastFailure;
+        $builder = clone $this;
+        $builder->lastFailure = $lastFailure;
 
-        return $this;
+        return $builder;
     }
 
     public function withFailureThreshold(int $failureThreshold): self
     {
-        $this->failureThreshold = $failureThreshold;
+        $builder = clone $this;
+        $builder->failureThreshold = $failureThreshold;
 
-        return $this;
+        return $builder;
     }
 
     public function withResetTimeout(int $resetTimeout): self
     {
-        $this->resetTimeout = $resetTimeout;
+        $builder = clone $this;
+        $builder->resetTimeout = $resetTimeout;
 
-        return $this;
+        return $builder;
     }
 
     public function build(): Circuit

@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
 
-class InMemoryStorageTest extends TestCase
+final class InMemoryStorageTest extends TestCase
 {
     public function testStorage(): void
     {

@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Storage\ApcuStorage;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 
-class ApcuStorageTest extends TestCase
+final class ApcuStorageTest extends TestCase
 {
     private ApcuStorage $storage;
 
@@ -34,7 +34,7 @@ class ApcuStorageTest extends TestCase
             self::markTestSkipped('APCu is not enabled');
         }
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withName('demo')
             ->withFailureCount(10)
             ->build();
@@ -55,7 +55,7 @@ class ApcuStorageTest extends TestCase
             self::markTestSkipped('Missing apcu extension');
         }
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withName('demo')
             ->withFailureCount(10)
             ->build();

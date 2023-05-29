@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Awareness\CircuitBreakerAwareTrait;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
 use PHPUnit\Framework\TestCase;
 
-class CircuitBreakerAwareTraitTest extends TestCase
+final class CircuitBreakerAwareTraitTest extends TestCase
 {
     public function testTraitMethods(): void
     {

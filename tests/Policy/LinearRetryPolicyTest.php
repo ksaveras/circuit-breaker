@@ -13,7 +13,7 @@ use Ksaveras\CircuitBreaker\Policy\LinearRetryPolicy;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 
-class LinearRetryPolicyTest extends TestCase
+final class LinearRetryPolicyTest extends TestCase
 {
     public function testNegativeInitialTimeout(): void
     {
@@ -51,25 +51,25 @@ class LinearRetryPolicyTest extends TestCase
     {
         $policy = new LinearRetryPolicy(10, 5, 100);
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(1)
             ->withFailureThreshold(2)
             ->build();
         self::assertEquals(10, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(2)
             ->withFailureThreshold(2)
             ->build();
         self::assertEquals(10, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(3)
             ->withFailureThreshold(2)
             ->build();
         self::assertEquals(15, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(4)
             ->withFailureThreshold(2)
             ->build();
@@ -80,19 +80,19 @@ class LinearRetryPolicyTest extends TestCase
     {
         $policy = new LinearRetryPolicy(20, 50, 100);
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(3)
             ->withFailureThreshold(2)
             ->build();
         self::assertEquals(70, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(4)
             ->withFailureThreshold(2)
             ->build();
         self::assertEquals(100, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(5)
             ->withFailureThreshold(2)
             ->build();

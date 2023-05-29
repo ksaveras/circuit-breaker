@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class RedisStorageTest extends TestCase
+final class RedisStorageTest extends TestCase
 {
     private RedisStorage $storage;
 
@@ -67,7 +67,7 @@ class RedisStorageTest extends TestCase
     {
         $now = time();
 
-        $circuit = CircuitBuilder::builder()->build();
+        $circuit = CircuitBuilder::new()->build();
 
         $this->client->expects(self::exactly(5))
             ->method('hSet')

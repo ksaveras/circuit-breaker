@@ -16,7 +16,7 @@ use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
-class PsrCacheStorageTest extends TestCase
+final class PsrCacheStorageTest extends TestCase
 {
     public function testReturnsNullIfNotFound(): void
     {
@@ -34,7 +34,7 @@ class PsrCacheStorageTest extends TestCase
         $storage = new PsrCacheStorage($adapter);
         $policy = new ConstantRetryPolicy();
 
-        $circuit = CircuitBuilder::builder()
+        $circuit = CircuitBuilder::new()
             ->withFailureCount(0)
             ->build();
 
@@ -57,7 +57,7 @@ class PsrCacheStorageTest extends TestCase
         $adapter = new ArrayAdapter();
         $storage = new PsrCacheStorage($adapter);
 
-        $circuit = CircuitBuilder::builder()->build();
+        $circuit = CircuitBuilder::new()->build();
 
         $storage->saveCircuit($circuit);
 

@@ -16,10 +16,16 @@ use Ksaveras\CircuitBreaker\State;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
-class CircuitTest extends TestCase
+/**
+ * @phpstan-import-type CircuitArray from Circuit
+ */
+final class CircuitTest extends TestCase
 {
     /**
      * @dataProvider circuitDataProvider
+     *
+     * @param CircuitArray $data
+     * @param CircuitArray $expected
      */
     public function testFromArray(array $data, array $expected): void
     {
@@ -28,7 +34,10 @@ class CircuitTest extends TestCase
         self::assertEquals($expected, $circuit->toArray());
     }
 
-    public function circuitDataProvider(): \Generator
+    /**
+     * @return array<int, array<int, CircuitArray>>
+     */
+    public function circuitDataProvider(): iterable
     {
         yield [
             [
@@ -67,6 +76,7 @@ class CircuitTest extends TestCase
         $this->expectException(CircuitBreakerException::class);
         $this->expectExceptionMessage('Missing required data field "name"');
 
+        /* @phpstan-ignore-next-line */
         Circuit::fromArray([]);
     }
 

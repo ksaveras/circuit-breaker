@@ -13,7 +13,7 @@ use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 
-class ConstantRetryPolicyTest extends TestCase
+final class ConstantRetryPolicyTest extends TestCase
 {
     public function testNegativeTimeout(): void
     {
@@ -27,13 +27,13 @@ class ConstantRetryPolicyTest extends TestCase
     {
         $policy = new ConstantRetryPolicy(600);
 
-        $circuit = CircuitBuilder::builder()->withFailureCount(0)->build();
+        $circuit = CircuitBuilder::new()->withFailureCount(0)->build();
         self::assertEquals(600, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()->withFailureCount(2)->build();
+        $circuit = CircuitBuilder::new()->withFailureCount(2)->build();
         self::assertEquals(600, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()->withFailureCount(4)->build();
+        $circuit = CircuitBuilder::new()->withFailureCount(4)->build();
         self::assertEquals(600, $policy->calculate($circuit));
     }
 }

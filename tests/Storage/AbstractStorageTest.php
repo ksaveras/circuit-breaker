@@ -12,7 +12,7 @@ namespace Ksaveras\CircuitBreaker\Tests\Storage;
 use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use PHPUnit\Framework\TestCase;
 
-class AbstractStorageTest extends TestCase
+final class AbstractStorageTest extends TestCase
 {
     /**
      * @dataProvider storageKeyDataProvider

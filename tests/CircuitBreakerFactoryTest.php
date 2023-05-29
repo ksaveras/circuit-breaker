@@ -10,14 +10,26 @@
 namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
+use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-class CircuitBreakerFactoryTest extends TestCase
+/**
+ * @phpstan-type ConfigArray array{
+ *      failure_threshold?: int,
+ *      retry_policy?: array{
+ *          type?: string,
+ *          options?: array{reset_timeout?: int, maximum_timeout?: int}
+ *      }
+ * }
+ */
+final class CircuitBreakerFactoryTest extends TestCase
 {
     /**
      * @dataProvider factoryConfigProvider
+     *
+     * @param ConfigArray $config
      */
     public function testCreate(array $config): void
     {
@@ -26,40 +38,26 @@ class CircuitBreakerFactoryTest extends TestCase
         $circuitBreaker = $factory->create('name');
 
         self::assertEquals('name', $circuitBreaker->getName());
-        self::assertEquals('closed', $circuitBreaker->getState());
+        self::assertEquals(State::CLOSED, $circuitBreaker->getState());
         self::assertTrue($circuitBreaker->isAvailable());
     }
 
+    /**
+     * @return array<string, array<int, ConfigArray>>
+     */
     public function factoryConfigProvider(): iterable
     {
-        yield [[]];
-
-        yield [[
-            'failure_threshold' => 3,
-        ]];
-
-        yield [[
-            'retry_policy' => ['options' => ['reset_timeout' => 4000]],
-        ]];
-
-        yield [[
-            'retry_policy' => ['options' => [
-                'reset_timeout' => 4000,
-                'maximum_timeout' => 50000,
-            ]],
-        ]];
-
-        yield [[
-            'retry_policy' => ['type' => 'constant'],
-        ]];
-
-        yield [[
-            'retry_policy' => ['type' => 'exponential'],
-        ]];
-
-        yield [[
-            'retry_policy' => ['type' => 'linear'],
-        ]];
+        return [
+            'empty config' => [[]],
+            'failure threshold' => [['failure_threshold' => 3]],
+            'retry policy' => [['retry_policy' => ['options' => ['reset_timeout' => 4000]]]],
+            'retry policy with maximum' => [
+                ['retry_policy' => ['options' => ['reset_timeout' => 4000, 'maximum_timeout' => 50000]]],
+            ],
+            'constant retry policy' => [['retry_policy' => ['type' => 'constant']]],
+            'exponential retry policy' => [['retry_policy' => ['type' => 'exponential']]],
+            'linear retry policy' => [['retry_policy' => ['type' => 'linear']]],
+        ];
     }
 
     public function testInvalidRetryPolicy(): void

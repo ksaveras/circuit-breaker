@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Predis\ClientInterface;
 
-class PredisStorageTest extends TestCase
+final class PredisStorageTest extends TestCase
 {
     private PredisStorage $storage;
 
@@ -68,7 +68,7 @@ class PredisStorageTest extends TestCase
     {
         $now = time();
 
-        $circuit = CircuitBuilder::builder()->build();
+        $circuit = CircuitBuilder::new()->build();
 
         $this->client
             ->expects(self::exactly(6))

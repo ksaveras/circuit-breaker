@@ -17,7 +17,7 @@ use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
-class CircuitBreakerTest extends TestCase
+final class CircuitBreakerTest extends TestCase
 {
     private CircuitBreaker $service;
 
