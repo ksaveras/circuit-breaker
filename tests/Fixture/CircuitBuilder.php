@@ -10,7 +10,6 @@
 namespace Ksaveras\CircuitBreaker\Tests\Fixture;
 
 use Ksaveras\CircuitBreaker\Circuit;
-use Ksaveras\CircuitBreaker\State;
 
 class CircuitBuilder
 {

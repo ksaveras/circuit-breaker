@@ -137,6 +137,6 @@ class CircuitBreakerTest extends TestCase
 
     private function successClosure(): \Closure
     {
-        return static fn() => 'success';
+        return static fn () => 'success';
     }
 }
