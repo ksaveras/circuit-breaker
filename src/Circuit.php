@@ -28,7 +28,7 @@ final class Circuit
         string $name,
         int $failureThreshold = 5,
         int $failureCount = 0,
-        ?int $lastFailure = null,
+        int $lastFailure = null,
         int $resetTimeout = 60
     ) {
         $this->name = $name;
