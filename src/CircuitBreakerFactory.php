@@ -9,96 +9,30 @@
  */
 namespace Ksaveras\CircuitBreaker;
 
-use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
-use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
-use Ksaveras\CircuitBreaker\Policy\LinearRetryPolicy;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
-use Symfony\Component\OptionsResolver\OptionsResolver;
 
-/**
- * @phpstan-type CircuitBreakerConfig array{
- *      failure_threshold?: int,
- *      retry_policy?: array{
- *          type?: string,
- *          options?: array{reset_timeout?: int, maximum_timeout?: int}
- *      }
- * }
- * @phpstan-type CircuitBreakerParsedConfig array{
- *     failure_threshold: int,
- *     retry_policy: array{
- *         type: string,
- *         options: array{
- *             reset_timeout: int,
- *             maximum_timeout: int
- *         }
- *     }
- * }
- */
 final class CircuitBreakerFactory
 {
-    /**
-     * @var CircuitBreakerParsedConfig
-     */
-    private array $config;
+    private int $failureThreshold;
 
     private StorageInterface $storage;
 
-    /**
-     * @param CircuitBreakerConfig $config
-     */
-    public function __construct(array $config, StorageInterface $storage)
-    {
-        $options = new OptionsResolver();
-        self::configureOptions($options);
+    private RetryPolicyInterface $retryPolicy;
 
-        /* @phpstan-ignore-next-line */
-        $this->config = $options->resolve($config);
+    public function __construct(int $failureThreshold, StorageInterface $storage, RetryPolicyInterface $retryPolicy)
+    {
+        if (0 >= $failureThreshold) {
+            throw new \InvalidArgumentException('Failure threshold must be positive non zero number.');
+        }
+
+        $this->failureThreshold = $failureThreshold;
         $this->storage = $storage;
-    }
-
-    protected static function configureOptions(OptionsResolver $options): void
-    {
-        $options->setRequired(['failure_threshold', 'retry_policy']);
-        $options->setAllowedTypes('failure_threshold', 'int');
-
-        $options->setDefaults([
-            'failure_threshold' => 5,
-            'retry_policy' => function (OptionsResolver $policyResolver) {
-                $policyResolver->setDefaults([
-                    'type' => 'exponential',
-                    'options' => function (OptionsResolver $optionsResolver) {
-                        $optionsResolver->setDefaults([
-                            'reset_timeout' => 60,
-                            'maximum_timeout' => 86400,
-                        ]);
-                        $optionsResolver->setAllowedTypes('reset_timeout', 'int');
-                        $optionsResolver->setAllowedTypes('maximum_timeout', 'int');
-                    },
-                ]);
-                $policyResolver->setAllowedValues('type', ['constant', 'exponential', 'linear']);
-            },
-        ]);
+        $this->retryPolicy = $retryPolicy;
     }
 
     public function create(string $name): CircuitBreaker
     {
-        return new CircuitBreaker($name, $this->config['failure_threshold'], $this->createRetryPolicy(), $this->storage);
-    }
-
-    private function createRetryPolicy(): RetryPolicyInterface
-    {
-        $options = $this->config['retry_policy']['options'];
-
-        switch ($this->config['retry_policy']['type']) {
-            case 'constant':
-                return new ConstantRetryPolicy($options['reset_timeout']);
-            case 'exponential':
-                return new ExponentialRetryPolicy($options['reset_timeout'], $options['maximum_timeout']);
-            case 'linear':
-                return new LinearRetryPolicy($options['reset_timeout']);
-            default:
-                throw new \LogicException(sprintf('Retry policy "%s" does not exists, it must be one of "constant", "exponential", "linear".', $this->config['retry_policy']['type']));
-        }
+        return new CircuitBreaker($name, $this->failureThreshold, $this->retryPolicy, $this->storage);
     }
 }
