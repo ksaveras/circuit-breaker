@@ -89,7 +89,7 @@ final class CircuitBreakerTest extends TestCase
      */
     public function testResetPeriod(): void
     {
-        ClockMock::register(__CLASS__);
+        ClockMock::register(self::class);
         ClockMock::register(CircuitBreaker::class);
         ClockMock::register(InMemoryStorage::class);
         ClockMock::withClockMock(true);
@@ -143,8 +143,6 @@ final class CircuitBreakerTest extends TestCase
 
     private function successClosure(): \Closure
     {
-        return static function () {
-            return 'success';
-        };
+        return static fn () => 'success';
     }
 }
