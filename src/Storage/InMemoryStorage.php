@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 final class InMemoryStorage implements StorageInterface
 {
     /**
-     * @var array<string, array<int, int|string>>
+     * @var array<string, array{0: int, 1: string}>
      */
     private array $circuits = [];
 
