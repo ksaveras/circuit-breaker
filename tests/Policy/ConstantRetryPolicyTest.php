@@ -15,10 +15,10 @@ use PHPUnit\Framework\TestCase;
 
 final class ConstantRetryPolicyTest extends TestCase
 {
-    public function testNegativeTimeout(): void
+    public function testNegativeTtl(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Timeout value must be 0 or positive integer.');
+        $this->expectExceptionMessage('TTL value must be a positive integer.');
 
         new ConstantRetryPolicy(-1);
     }

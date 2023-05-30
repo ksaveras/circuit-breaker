@@ -13,18 +13,18 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 final class ConstantRetryPolicy implements RetryPolicyInterface
 {
-    private int $timeout;
+    private int $ttlSeconds;
 
-    public function __construct(int $timeout = 600)
+    public function __construct(int $ttlSeconds = 600)
     {
-        if ($timeout < 0) {
-            throw new \InvalidArgumentException('Timeout value must be 0 or positive integer.');
+        if ($ttlSeconds < 0) {
+            throw new \InvalidArgumentException('TTL value must be a positive integer.');
         }
-        $this->timeout = $timeout;
+        $this->ttlSeconds = $ttlSeconds;
     }
 
     public function calculate(Circuit $circuit): int
     {
-        return $this->timeout;
+        return $this->ttlSeconds;
     }
 }
