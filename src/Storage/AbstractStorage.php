@@ -12,7 +12,7 @@ namespace Ksaveras\CircuitBreaker\Storage;
 abstract class AbstractStorage implements StorageInterface
 {
     public const STORAGE_PREFIX = 'CircuitBreaker';
-    private const RESERVED_CHARACTERS = '{}()/\@:';
+    public const RESERVED_CHARACTERS = '{}()/\@:';
 
     public static function storageKey(string $name): string
     {
