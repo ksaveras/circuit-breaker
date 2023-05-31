@@ -13,7 +13,7 @@ use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
-final class CircuitBreaker
+final class CircuitBreaker implements CircuitBreakerInterface
 {
     private string $name;
 
