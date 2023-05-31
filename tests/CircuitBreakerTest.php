@@ -99,28 +99,33 @@ final class CircuitBreakerTest extends TestCase
 
         try {
             $this->service->call($this->failingClosure());
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         self::assertEquals(State::CLOSED, $this->service->getState());
 
         try {
             $this->service->call($this->failingClosure());
-        } catch (\Exception $exception) {
+        } catch (\Exception) {
         }
 
         self::assertEquals(State::OPEN, $this->service->getState());
 
         sleep(100);
 
-        try {
-            $this->service->call($this->successClosure());
-        } catch (\Exception $exception) {
-        }
+        $this->service->call($this->successClosure());
 
         self::assertEquals(State::CLOSED, $this->service->getState());
 
         ClockMock::withClockMock(false);
+    }
+
+    public function testResetWhenServiceBecomesAvailable(): void
+    {
+        $this->service->failure();
+        $this->service->call($this->successClosure());
+
+        self::assertEquals(State::CLOSED, $this->service->getState());
     }
 
     public function testCircuitFunctions(): void

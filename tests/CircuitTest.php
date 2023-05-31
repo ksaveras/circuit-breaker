@@ -28,7 +28,7 @@ final class CircuitTest extends TestCase
 
         self::assertInstanceOf(Circuit::class, $circuit);
 
-        self::assertEquals($initial->getName(), $circuit->getName());
+        self::assertEquals($initial->getName(), (string) $circuit);
         self::assertEquals($initial->getFailureCount(), $circuit->getFailureCount());
         self::assertEquals($initial->getLastFailure(), $circuit->getLastFailure());
         self::assertEquals($initial->getFailureThreshold(), $circuit->getFailureThreshold());
