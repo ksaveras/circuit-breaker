@@ -1,32 +1,31 @@
-name: "Static Analysis"
+name: Static Analysis
 
 on:
   pull_request:
     branches:
-      - "main"
+      - main
 
 jobs:
   static-analysis:
-    name: "Static Analysis"
-    runs-on: "ubuntu-latest"
+    name: Static Analysis
+    runs-on: ubuntu-latest
 
     steps:
-      - name: "Checkout"
-        uses: "actions/checkout@v2"
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
           fetch-depth: 2
 
-      - name: "Install PHP"
-        uses: "shivammathur/setup-php@v2"
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
         with:
-          php-version: "7.4"
-          extensions: "redis"
-          tools: "composer:v2"
+          php-version: 8.2
+          tools: composer:v2
 
-      - name: "Install dependencies with Composer"
-        uses: "ramsey/composer-install@v2"
+      - name: Install dependencies with Composer
+        uses: ramsey/composer-install@v2
         with:
-          composer-options: "--prefer-dist --optimize-autoloader"
+          composer-options: --prefer-dist --optimize-autoloader
 
-      - name: "Run PHPStan"
-        run: "./vendor/bin/phpstan analyse --error-format=github"
+      - name: Run PHPStan
+        run: composer phpstan -- --error-format=github

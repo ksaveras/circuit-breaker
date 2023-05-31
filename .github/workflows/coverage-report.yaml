@@ -23,8 +23,7 @@ jobs:
         with:
           php-version: 8.2
           coverage: pcov
-          ini-values: "zend.assertions=1, apc.enable_cli=1"
-          extensions: redis,apcu
+          ini-values: zend.assertions=1
           tools: composer:v2,flex
 
       - name: Install dependencies
