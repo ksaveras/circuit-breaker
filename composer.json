@@ -43,7 +43,7 @@
         "rector:fix": "@php ./vendor/bin/rector process",
         "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit",
         "test:coverage": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit --coverage-clover=coverage/clover.xml",
-        "static-analysis": ["@phpcs", "@phpstan"]
+        "static-analysis": ["@phpcs", "@phpstan", "@rector"]
     },
     "config": {
         "sort-packages": true
