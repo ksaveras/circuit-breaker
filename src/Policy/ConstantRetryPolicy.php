@@ -13,14 +13,12 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 final class ConstantRetryPolicy implements RetryPolicyInterface
 {
-    private int $ttlSeconds;
-
-    public function __construct(int $ttlSeconds = 600)
-    {
-        if ($ttlSeconds < 0) {
+    public function __construct(
+        private readonly int $ttlSeconds = 600
+    ) {
+        if ($this->ttlSeconds < 0) {
             throw new \InvalidArgumentException('TTL value must be a positive integer.');
         }
-        $this->ttlSeconds = $ttlSeconds;
     }
 
     public function calculate(Circuit $circuit): int

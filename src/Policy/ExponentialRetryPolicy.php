@@ -13,35 +13,28 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 final class ExponentialRetryPolicy implements RetryPolicyInterface
 {
-    private int $initialTimeout;
-
-    private int $base;
-
-    private int $maximum;
-
-    public function __construct(int $initialTimeout = 600, int $maximum = 86400, int $base = 2)
-    {
-        if ($initialTimeout < 0) {
+    public function __construct(
+        private readonly int $initialTtl = 10,
+        private readonly int $maximumTtl = 86400,
+        private readonly int $base = 2,
+    ) {
+        if ($this->initialTtl < 0) {
             throw new \InvalidArgumentException('Initial timeout can not be negative number.');
         }
 
-        if ($base <= 1) {
+        if ($this->base <= 1) {
             throw new \InvalidArgumentException('Base value must be greater than 1.');
         }
 
-        if ($maximum <= 0 || $initialTimeout > $maximum) {
+        if ($this->maximumTtl <= 0 || $this->initialTtl > $this->maximumTtl) {
             throw new \InvalidArgumentException('Maximum timeout must be positive and greater than initial timeout.');
         }
-
-        $this->initialTimeout = $initialTimeout;
-        $this->base = $base;
-        $this->maximum = $maximum;
     }
 
     public function calculate(Circuit $circuit): int
     {
         $retries = max(0, $circuit->getFailureCount() - $circuit->getFailureThreshold());
 
-        return min($this->maximum, $this->base ** $retries + $this->initialTimeout);
+        return min($this->maximumTtl, $this->base ** $retries + $this->initialTtl);
     }
 }

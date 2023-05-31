@@ -18,9 +18,9 @@ final class LinearRetryPolicyTest extends TestCase
     public function testNegativeInitialTimeout(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Initial timeout can not be negative number.');
+        $this->expectExceptionMessage('Initial TTL can not be negative number.');
 
-        new LinearRetryPolicy(-1, 2, 10);
+        new LinearRetryPolicy(-1, 10, 2);
     }
 
     public function testInvalidStepValue(): void
@@ -28,28 +28,28 @@ final class LinearRetryPolicyTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Step value must be positive number.');
 
-        new LinearRetryPolicy(1, 0, 10);
+        new LinearRetryPolicy(1, 10, 0);
     }
 
     public function testNegativeMaximumTimeoutValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Maximum timeout must be positive and greater than initial timeout.');
+        $this->expectExceptionMessage('Maximum TTL must be positive and greater than initial TTL.');
 
-        new LinearRetryPolicy(1, 2, -1);
+        new LinearRetryPolicy(1, -1, 2);
     }
 
     public function testInvalidMaximumTimeoutValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Maximum timeout must be positive and greater than initial timeout.');
+        $this->expectExceptionMessage('Maximum TTL must be positive and greater than initial TTL.');
 
         new LinearRetryPolicy(10, 2, 2);
     }
 
     public function testCalculateRetryTtl(): void
     {
-        $policy = new LinearRetryPolicy(10, 5, 100);
+        $policy = new LinearRetryPolicy(10, 100, 5);
 
         $circuit = CircuitBuilder::new()
             ->withFailureCount(1)
@@ -78,7 +78,7 @@ final class LinearRetryPolicyTest extends TestCase
 
     public function testCalculateMaximumRetryTtl(): void
     {
-        $policy = new LinearRetryPolicy(20, 50, 100);
+        $policy = new LinearRetryPolicy(20, 100, 50);
 
         $circuit = CircuitBuilder::new()
             ->withFailureCount(3)

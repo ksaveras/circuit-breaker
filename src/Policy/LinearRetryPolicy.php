@@ -13,35 +13,28 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 final class LinearRetryPolicy implements RetryPolicyInterface
 {
-    private int $initialTimeout;
-
-    private int $step;
-
-    private int $maximum;
-
-    public function __construct(int $initialTimeout = 600, int $step = 600, int $maximum = 86400)
-    {
-        if ($initialTimeout < 0) {
-            throw new \InvalidArgumentException('Initial timeout can not be negative number.');
+    public function __construct(
+        private readonly int $initialTtl = 600,
+        private readonly int $maximumTtl = 86400,
+        private readonly int $step = 600,
+    ) {
+        if ($this->initialTtl < 0) {
+            throw new \InvalidArgumentException('Initial TTL can not be negative number.');
         }
 
-        if ($step <= 0) {
+        if ($this->step <= 0) {
             throw new \InvalidArgumentException('Step value must be positive number.');
         }
 
-        if ($maximum <= 0 || $initialTimeout > $maximum) {
-            throw new \InvalidArgumentException('Maximum timeout must be positive and greater than initial timeout.');
+        if ($this->maximumTtl <= 0 || $this->initialTtl > $this->maximumTtl) {
+            throw new \InvalidArgumentException('Maximum TTL must be positive and greater than initial TTL.');
         }
-
-        $this->initialTimeout = $initialTimeout;
-        $this->step = $step;
-        $this->maximum = $maximum;
     }
 
     public function calculate(Circuit $circuit): int
     {
         $retries = max(0, $circuit->getFailureCount() - $circuit->getFailureThreshold());
 
-        return min($this->maximum, $this->initialTimeout + ($retries * $this->step));
+        return min($this->maximumTtl, $this->initialTtl + ($retries * $this->step));
     }
 }
