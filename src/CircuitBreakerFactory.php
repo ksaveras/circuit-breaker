@@ -14,21 +14,14 @@ use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
 final class CircuitBreakerFactory
 {
-    private int $failureThreshold;
-
-    private StorageInterface $storage;
-
-    private RetryPolicyInterface $retryPolicy;
-
-    public function __construct(int $failureThreshold, StorageInterface $storage, RetryPolicyInterface $retryPolicy)
-    {
-        if (0 >= $failureThreshold) {
+    public function __construct(
+        private readonly int $failureThreshold,
+        private readonly StorageInterface $storage,
+        private readonly RetryPolicyInterface $retryPolicy
+    ) {
+        if (0 >= $this->failureThreshold) {
             throw new \InvalidArgumentException('Failure threshold must be positive non zero number.');
         }
-
-        $this->failureThreshold = $failureThreshold;
-        $this->storage = $storage;
-        $this->retryPolicy = $retryPolicy;
     }
 
     public function create(string $name): CircuitBreaker
