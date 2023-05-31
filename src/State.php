@@ -9,20 +9,9 @@
  */
 namespace Ksaveras\CircuitBreaker;
 
-/**
- * @codeCoverageIgnore
- */
-final class State
+enum State
 {
-    public const OPEN = 'open';
-    public const HALF_OPEN = 'half-open';
-    public const CLOSED = 'closed';
-
-    private function __construct()
-    {
-    }
-
-    private function __clone()
-    {
-    }
+    case OPEN;
+    case HALF_OPEN;
+    case CLOSED;
 }

@@ -37,7 +37,7 @@ final class CircuitBreakerAwareTraitTest extends TestCase
     }
 }
 
-class MockObject implements CircuitBreakerAwareInterface
+final class MockObject implements CircuitBreakerAwareInterface
 {
     use CircuitBreakerAwareTrait;
 }

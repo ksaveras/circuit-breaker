@@ -23,8 +23,10 @@ final class CircuitTest extends TestCase
         $initial = CircuitBuilder::new()->build();
 
         $serialized = serialize($initial);
-        /* @var Circuit $circuit */
+
         $circuit = unserialize($serialized, ['allowed_classes' => [Circuit::class]]);
+
+        self::assertInstanceOf(Circuit::class, $circuit);
 
         self::assertEquals($initial->getName(), $circuit->getName());
         self::assertEquals($initial->getFailureCount(), $circuit->getFailureCount());

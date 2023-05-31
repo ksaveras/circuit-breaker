@@ -1,0 +1,11 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Cannot use array destructuring on array\\|false\\.$#"
+			count: 1
+			path: src/Circuit.php
+
+		-
+			message: "#^Method Ksaveras\\\\CircuitBreaker\\\\Circuit\\:\\:__unserialize\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Circuit.php

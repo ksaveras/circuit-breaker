@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
@@ -28,7 +27,7 @@ final class Circuit
         string $name,
         int $failureThreshold = 5,
         int $failureCount = 0,
-        ?float $lastFailure = null,
+        float $lastFailure = null,
         int $resetTimeout = 60
     ) {
         $this->name = $name;
@@ -48,13 +47,13 @@ final class Circuit
         return $this->name;
     }
 
-    public function getState(): string
+    public function getState(): State
     {
         if ($this->failureCount < $this->failureThreshold) {
             return State::CLOSED;
         }
 
-        return (microtime(true) - $this->getLastFailure()) > $this->getExpirationTime() ? State::HALF_OPEN : State::OPEN;
+        return (microtime(true) - ($this->lastFailure ?? 0.0)) > $this->getExpirationTime() ? State::HALF_OPEN : State::OPEN;
     }
 
     public function getFailureCount(): int
@@ -65,7 +64,7 @@ final class Circuit
     public function increaseFailure(RetryPolicyInterface $policy): void
     {
         ++$this->failureCount;
-        $this->lastFailure = time();
+        $this->lastFailure = microtime(true);
         $this->resetTimeout = $policy->calculate($this);
     }
 

@@ -14,7 +14,7 @@ use Psr\Cache\CacheItemPoolInterface;
 
 final class CacheStorage implements StorageInterface
 {
-    private CacheItemPoolInterface $cache;
+    private readonly CacheItemPoolInterface $cache;
 
     public function __construct(CacheItemPoolInterface $cache)
     {
