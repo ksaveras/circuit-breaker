@@ -11,29 +11,16 @@ namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
-use Ksaveras\CircuitBreaker\Storage\AbstractStorage;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
-class CircuitBreaker
+final class CircuitBreaker implements CircuitBreakerInterface
 {
-    private string $name;
-
-    private int $failureThreshold;
-
-    private RetryPolicyInterface $retryPolicy;
-
-    private StorageInterface $storage;
-
     public function __construct(
-        string $name,
-        int $failureThreshold,
-        RetryPolicyInterface $retryPolicy,
-        StorageInterface $storage
+        private readonly string $name,
+        private readonly int $failureThreshold,
+        private readonly RetryPolicyInterface $retryPolicy,
+        private readonly StorageInterface $storage
     ) {
-        $this->name = AbstractStorage::validateKey($name);
-        $this->failureThreshold = $failureThreshold;
-        $this->retryPolicy = $retryPolicy;
-        $this->storage = $storage;
     }
 
     public function getName(): string
@@ -41,24 +28,20 @@ class CircuitBreaker
         return $this->name;
     }
 
-    public function getState(): string
+    public function getState(): State
     {
         return $this->getCircuit()->getState();
     }
 
     /**
-     * @return mixed
-     *
      * @throws \Throwable
      */
-    public function call(callable $closure)
+    public function call(callable $closure): mixed
     {
         $circuit = $this->getCircuit();
         $state = $circuit->getState();
 
         switch ($state) {
-            case State::OPEN:
-                throw new OpenCircuitException();
             case State::CLOSED:
             case State::HALF_OPEN:
                 try {
@@ -68,39 +51,41 @@ class CircuitBreaker
                     }
 
                     return $result;
-                } catch (\Throwable $exception) {
+                } catch (\Throwable $throwable) {
                     $this->failure();
 
-                    throw $exception;
+                    throw $throwable;
                 }
             default:
-                throw new \LogicException(sprintf('Unsupported Circuit state "%s"', $state));
+                throw new OpenCircuitException();
         }
     }
 
     public function isAvailable(): bool
     {
-        $state = $this->getCircuit()->getState();
-
-        return \in_array($state, [State::CLOSED, State::HALF_OPEN], true);
+        return match ($this->getCircuit()->getState()) {
+            State::CLOSED,
+            State::HALF_OPEN => true,
+            default => false,
+        };
     }
 
     public function success(): void
     {
-        $this->storage->resetCircuit($this->name);
+        $this->storage->delete($this->name);
     }
 
     public function failure(): void
     {
         $circuit = $this->getCircuit();
         $circuit->increaseFailure($this->retryPolicy);
-        $this->storage->saveCircuit($circuit);
+        $this->storage->save($circuit);
     }
 
-    protected function getCircuit(): Circuit
+    private function getCircuit(): Circuit
     {
-        if (null === $circuit = $this->storage->getCircuit($this->name)) {
-            $circuit = new Circuit($this->name, $this->failureThreshold);
+        if (null === $circuit = $this->storage->fetch($this->name)) {
+            return new Circuit($this->name, $this->failureThreshold);
         }
 
         return $circuit;

@@ -9,9 +9,17 @@
  */
 namespace Ksaveras\CircuitBreaker;
 
-enum State
+interface CircuitBreakerInterface
 {
-    case OPEN;
-    case HALF_OPEN;
-    case CLOSED;
+    public function getName(): string;
+
+    public function getState(): State;
+
+    public function isAvailable(): bool;
+
+    public function call(callable $closure): mixed;
+
+    public function success(): void;
+
+    public function failure(): void;
 }

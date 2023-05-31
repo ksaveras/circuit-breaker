@@ -10,64 +10,30 @@
 namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
+use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
+use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\OptionsResolver\Exception\InvalidOptionsException;
 
-class CircuitBreakerFactoryTest extends TestCase
+final class CircuitBreakerFactoryTest extends TestCase
 {
-    /**
-     * @dataProvider factoryConfigProvider
-     */
-    public function testCreate(array $config): void
+    public function testCreate(): void
     {
-        $factory = new CircuitBreakerFactory($config, new InMemoryStorage());
+        $factory = new CircuitBreakerFactory(3, new InMemoryStorage(), new ExponentialRetryPolicy());
 
         $circuitBreaker = $factory->create('name');
 
         self::assertEquals('name', $circuitBreaker->getName());
-        self::assertEquals('closed', $circuitBreaker->getState());
+        self::assertEquals(State::CLOSED, $circuitBreaker->getState());
         self::assertTrue($circuitBreaker->isAvailable());
     }
 
-    public function factoryConfigProvider(): iterable
+    public function testInvalidFailureThreshold(): void
     {
-        yield [[]];
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Failure threshold must be positive non zero number.');
 
-        yield [[
-            'failure_threshold' => 3,
-        ]];
-
-        yield [[
-            'retry_policy' => ['options' => ['reset_timeout' => 4000]],
-        ]];
-
-        yield [[
-            'retry_policy' => ['options' => [
-                'reset_timeout' => 4000,
-                'maximum_timeout' => 50000,
-            ]],
-        ]];
-
-        yield [[
-            'retry_policy' => ['type' => 'constant'],
-        ]];
-
-        yield [[
-            'retry_policy' => ['type' => 'exponential'],
-        ]];
-
-        yield [[
-            'retry_policy' => ['type' => 'linear'],
-        ]];
-    }
-
-    public function testInvalidRetryPolicy(): void
-    {
-        $this->expectException(InvalidOptionsException::class);
-        $this->expectExceptionMessage('The option "type" with value "nonexistent" is invalid. Accepted values are: "constant", "exponential", "linear".');
-
-        $factory = new CircuitBreakerFactory(['retry_policy' => ['type' => 'nonexistent']], new InMemoryStorage());
+        $factory = new CircuitBreakerFactory(0, new InMemoryStorage(), new ExponentialRetryPolicy());
 
         $factory->create('name');
     }

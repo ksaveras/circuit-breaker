@@ -11,16 +11,13 @@ namespace Ksaveras\CircuitBreaker\Tests\Fixture;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-class CircuitBuilder
+final class CircuitBuilder
 {
-    private string $name = 'demo';
+    private string $name = 'CB item';
 
     private int $failureCount = 3;
 
-    /**
-     * @var int
-     */
-    private $lastFailure;
+    private ?float $lastFailure = null;
 
     private int $failureThreshold = 2;
 
@@ -28,59 +25,61 @@ class CircuitBuilder
 
     private function __construct()
     {
-        $this->lastFailure = time();
     }
 
-    public static function builder(): self
+    public static function new(): self
     {
         return new self();
     }
 
     public function withName(string $name): self
     {
-        $this->name = $name;
+        $builder = clone $this;
+        $builder->name = $name;
 
-        return $this;
+        return $builder;
     }
 
     public function withFailureCount(int $failureCount): self
     {
-        $this->failureCount = $failureCount;
+        $builder = clone $this;
+        $builder->failureCount = $failureCount;
 
-        return $this;
+        return $builder;
     }
 
-    public function withLastFailure(int $lastFailure): self
+    public function withLastFailure(float $lastFailure): self
     {
-        $this->lastFailure = $lastFailure;
+        $builder = clone $this;
+        $builder->lastFailure = $lastFailure;
 
-        return $this;
+        return $builder;
     }
 
     public function withFailureThreshold(int $failureThreshold): self
     {
-        $this->failureThreshold = $failureThreshold;
+        $builder = clone $this;
+        $builder->failureThreshold = $failureThreshold;
 
-        return $this;
+        return $builder;
     }
 
     public function withResetTimeout(int $resetTimeout): self
     {
-        $this->resetTimeout = $resetTimeout;
+        $builder = clone $this;
+        $builder->resetTimeout = $resetTimeout;
 
-        return $this;
+        return $builder;
     }
 
     public function build(): Circuit
     {
-        return Circuit::fromArray(
-            [
-                'name' => $this->name,
-                'failureThreshold' => $this->failureThreshold,
-                'failureCount' => $this->failureCount,
-                'lastFailure' => $this->lastFailure,
-                'resetTimeout' => $this->resetTimeout,
-            ]
+        return new Circuit(
+            $this->name,
+            $this->failureThreshold,
+            $this->failureCount,
+            $this->lastFailure,
+            $this->resetTimeout
         );
     }
 }

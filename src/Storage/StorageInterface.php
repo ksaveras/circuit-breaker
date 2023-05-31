@@ -13,9 +13,9 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 interface StorageInterface
 {
-    public function getCircuit(string $name): ?Circuit;
+    public function save(Circuit $circuit): void;
 
-    public function saveCircuit(Circuit $circuit): void;
+    public function fetch(string $name): ?Circuit;
 
-    public function resetCircuit(string $name): void;
+    public function delete(string $name): void;
 }

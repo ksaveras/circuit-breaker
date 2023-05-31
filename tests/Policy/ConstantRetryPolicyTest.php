@@ -13,12 +13,12 @@ use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 
-class ConstantRetryPolicyTest extends TestCase
+final class ConstantRetryPolicyTest extends TestCase
 {
-    public function testNegativeTimeout(): void
+    public function testNegativeTtl(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Timeout value must be 0 or positive integer.');
+        $this->expectExceptionMessage('TTL value must be a positive integer.');
 
         new ConstantRetryPolicy(-1);
     }
@@ -27,13 +27,13 @@ class ConstantRetryPolicyTest extends TestCase
     {
         $policy = new ConstantRetryPolicy(600);
 
-        $circuit = CircuitBuilder::builder()->withFailureCount(0)->build();
+        $circuit = CircuitBuilder::new()->withFailureCount(0)->build();
         self::assertEquals(600, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()->withFailureCount(2)->build();
+        $circuit = CircuitBuilder::new()->withFailureCount(2)->build();
         self::assertEquals(600, $policy->calculate($circuit));
 
-        $circuit = CircuitBuilder::builder()->withFailureCount(4)->build();
+        $circuit = CircuitBuilder::new()->withFailureCount(4)->build();
         self::assertEquals(600, $policy->calculate($circuit));
     }
 }

@@ -9,7 +9,7 @@
  */
 namespace Ksaveras\CircuitBreaker\Exception;
 
-class OpenCircuitException extends CircuitBreakerException
+final class OpenCircuitException extends CircuitBreakerException
 {
     public function __construct(string $message = 'Open Circuit', int $code = 0, \Throwable $previous = null)
     {

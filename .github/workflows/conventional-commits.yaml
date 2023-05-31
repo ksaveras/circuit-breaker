@@ -1,4 +1,4 @@
-name: "Conventional Commits"
+name: Conventional Commits
 
 on:
   #  https://github.com/marketplace/actions/semantic-pull-request#event-triggers:

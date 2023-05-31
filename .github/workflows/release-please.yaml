@@ -19,5 +19,6 @@ jobs:
         id: release
         with:
           token: ${{secrets.GITHUB_TOKEN}}
+          package-name: ""
           release-type: php
           default-branch: main

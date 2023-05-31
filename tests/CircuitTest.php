@@ -10,76 +10,37 @@
 namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\Circuit;
-use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
+use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
-class CircuitTest extends TestCase
+final class CircuitTest extends TestCase
 {
-    /**
-     * @dataProvider circuitDataProvider
-     */
-    public function testFromArray(array $data, array $expected): void
+    public function testSerialize(): void
     {
-        $circuit = Circuit::fromArray($data);
+        $initial = CircuitBuilder::new()->build();
 
-        self::assertEquals($expected, $circuit->toArray());
-    }
+        $serialized = serialize($initial);
 
-    public function circuitDataProvider(): \Generator
-    {
-        yield [
-            [
-                'name' => 'demo',
-            ],
-            [
-                'name' => 'demo',
-                'failureCount' => 0,
-                'lastFailure' => null,
-                'resetTimeout' => 60,
-                'failureThreshold' => 5,
-            ],
-        ];
+        $circuit = unserialize($serialized, ['allowed_classes' => [Circuit::class]]);
 
-        $now = time();
-        yield [
-            [
-                'name' => 'demo',
-                'failureCount' => 10,
-                'lastFailure' => $now,
-                'resetTimeout' => 120,
-                'failureThreshold' => 5,
-            ],
-            [
-                'name' => 'demo',
-                'failureCount' => 10,
-                'lastFailure' => $now,
-                'resetTimeout' => 120,
-                'failureThreshold' => 5,
-            ],
-        ];
-    }
+        self::assertInstanceOf(Circuit::class, $circuit);
 
-    public function testWithEmptyArray(): void
-    {
-        $this->expectException(CircuitBreakerException::class);
-        $this->expectExceptionMessage('Missing required data field "name"');
-
-        Circuit::fromArray([]);
+        self::assertEquals($initial->getName(), (string) $circuit);
+        self::assertEquals($initial->getFailureCount(), $circuit->getFailureCount());
+        self::assertEquals($initial->getLastFailure(), $circuit->getLastFailure());
+        self::assertEquals($initial->getFailureThreshold(), $circuit->getFailureThreshold());
+        self::assertEquals($initial->getResetTimeout(), $circuit->getResetTimeout());
     }
 
     public function testReset(): void
     {
-        $circuit = Circuit::fromArray(
-            [
-                'name' => 'demo',
-                'failureCount' => 10,
-                'lastFailure' => time(),
-                'resetTimeout' => 120,
-            ]
-        );
+        $circuit = CircuitBuilder::new()
+            ->withFailureCount(10)
+            ->withLastFailure(microtime(true))
+            ->build();
 
         $circuit->reset();
 
@@ -119,11 +80,11 @@ class CircuitTest extends TestCase
 
         $circuit->increaseFailure($policy);
         self::assertEquals(1, $circuit->getFailureCount());
-        self::assertEquals(ClockMock::time(), $circuit->getLastFailure());
+        self::assertEquals(ClockMock::microtime(true), $circuit->getLastFailure());
 
         $circuit->increaseFailure($policy);
         self::assertEquals(2, $circuit->getFailureCount());
-        self::assertEquals(ClockMock::time(), $circuit->getLastFailure());
+        self::assertEquals(ClockMock::microtime(true), $circuit->getLastFailure());
 
         ClockMock::withClockMock(false);
     }
