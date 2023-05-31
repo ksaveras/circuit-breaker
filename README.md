@@ -1,9 +1,4 @@
 # Circuit Breaker
-![Travis (.org) branch](https://img.shields.io/travis/ksaveras/circuit-breaker/master)
-[![Maintainability](https://api.codeclimate.com/v1/badges/ff7c6a6aafed0d8e49f1/maintainability)](https://codeclimate.com/github/ksaveras/circuit-breaker/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/ff7c6a6aafed0d8e49f1/test_coverage)](https://codeclimate.com/github/ksaveras/circuit-breaker/test_coverage)
-![PHPStan Level](https://img.shields.io/badge/PHPStan%20Level-8-brightgreen)
-![GitHub](https://img.shields.io/github/license/ksaveras/circuit-breaker)
 
 More information: https://martinfowler.com/bliki/CircuitBreaker.html
 
@@ -14,23 +9,28 @@ composer require ksaveras/circuit-breaker
 
 ## Use
 
-Simple circuit check
+Simple circuit check using Symfony Redis cache
 
 ```php
-use \Ksaveras\CircuitBreaker\CircuitBreakerFactory;
-use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
+use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
+use Ksaveras\CircuitBreaker\Storage\CacheStorage;
+use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+
+$redisAdapter = new RedisAdapter(
+    RedisAdapter::createConnection('redis://localhost'),
+    // the namespace for circuit breaker storage
+    'circuit-breaker',
+    // max TTL is set to 24 hours
+    86400
+);
 
 $factory = new CircuitBreakerFactory(
-    [
-        'failure_threshold' => 3,
-        'retry_policy' => [
-            'type' => 'exponential',
-            'options' => [
-                'reset_timeout' => 300,
-            ],
-        ],
-    ],
-    new ApcuStorage()
+    // max 3 failures before setting circuit breaker as open
+    3,
+    new CacheStorage($redisAdapter),
+    // exponential retry starting with 30 seconds
+    new ExponentialRetryPolicy(30),
 );
 
 $circuitBreaker = $factory->create('service-api');
@@ -41,28 +41,32 @@ if ($circuitBreaker->isAvailable()) {
         $circuitBreaker->success();
     } catch (\Exception $exception) {
         $circuitBreaker->failure();
-    }   
+    }
 }
 ```
 
 Use callback
 
 ```php
-use \Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
-use \Ksaveras\CircuitBreaker\CircuitBreakerFactory;
-use \Ksaveras\CircuitBreaker\Storage\ApcuStorage;
+use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
+use Ksaveras\CircuitBreaker\Storage\CacheStorage;
+use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+
+$redisAdapter = new RedisAdapter(
+    RedisAdapter::createConnection('redis://localhost'),
+    // the namespace for circuit breaker storage
+    'circuit-breaker',
+    // max TTL is set to 24 hours
+    86400
+);
 
 $factory = new CircuitBreakerFactory(
-    [
-        'failure_threshold' => 3,
-        'retry_policy' => [
-            'type' => 'exponential',
-            'options' => [
-                'reset_timeout' => 300,
-            ],
-        ],
-    ],
-    new ApcuStorage()
+    // max 3 failures before setting circuit breaker as open
+    3,
+    new CacheStorage($redisAdapter),
+    // exponential retry starting with 30 seconds
+    new ExponentialRetryPolicy(30),
 );
 
 $circuitBreaker = $factory->create('service-api');
@@ -85,8 +89,7 @@ try {
 composer test
 ```
 
-## Code quality
+## Code Quality
 ```
-composer phpstan
-composer phpcsfix
+composer static-analysis
 ```
