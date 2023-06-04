@@ -14,20 +14,20 @@ use Ksaveras\CircuitBreaker\Circuit;
 final class ExponentialRetryPolicy implements RetryPolicyInterface
 {
     public function __construct(
-        private readonly int $initialTtl = 10,
-        private readonly int $maximumTtl = 86400,
-        private readonly int $base = 2,
+        private readonly int $startSleepSeconds = 10,
+        private readonly int $maxSleepSeconds = 86400,
+        private readonly float $base = 2.0,
     ) {
-        if ($this->initialTtl < 0) {
-            throw new \InvalidArgumentException('Initial timeout can not be negative number.');
+        if ($this->startSleepSeconds < 0) {
+            throw new \InvalidArgumentException('Start sleep value can not be negative number.');
         }
 
-        if ($this->base <= 1) {
+        if ($this->base <= 1.0) {
             throw new \InvalidArgumentException('Base value must be greater than 1.');
         }
 
-        if ($this->maximumTtl <= 0 || $this->initialTtl > $this->maximumTtl) {
-            throw new \InvalidArgumentException('Maximum timeout must be positive and greater than initial timeout.');
+        if ($this->maxSleepSeconds <= 0 || $this->startSleepSeconds > $this->maxSleepSeconds) {
+            throw new \InvalidArgumentException('Maximum sleep value must be positive and greater than initial timeout.');
         }
     }
 
@@ -35,6 +35,6 @@ final class ExponentialRetryPolicy implements RetryPolicyInterface
     {
         $retries = max(0, $circuit->getFailureCount() - $circuit->getFailureThreshold());
 
-        return min($this->maximumTtl, $this->base ** $retries + $this->initialTtl);
+        return min($this->maxSleepSeconds, (int) ($this->base ** $retries + $this->startSleepSeconds));
     }
 }

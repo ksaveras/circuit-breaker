@@ -18,7 +18,7 @@ final class LinearRetryPolicyTest extends TestCase
     public function testNegativeInitialTimeout(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Initial TTL can not be negative number.');
+        $this->expectExceptionMessage('Start sleep value value can not be negative number.');
 
         new LinearRetryPolicy(-1, 10, 2);
     }
@@ -34,7 +34,7 @@ final class LinearRetryPolicyTest extends TestCase
     public function testNegativeMaximumTimeoutValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Maximum TTL must be positive and greater than initial TTL.');
+        $this->expectExceptionMessage('Maximum sleep value must be positive and greater than start sleep.');
 
         new LinearRetryPolicy(1, -1, 2);
     }
@@ -42,7 +42,7 @@ final class LinearRetryPolicyTest extends TestCase
     public function testInvalidMaximumTimeoutValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Maximum TTL must be positive and greater than initial TTL.');
+        $this->expectExceptionMessage('Maximum sleep value must be positive and greater than start sleep.');
 
         new LinearRetryPolicy(10, 2, 2);
     }
