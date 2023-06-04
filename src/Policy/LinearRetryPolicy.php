@@ -14,20 +14,20 @@ use Ksaveras\CircuitBreaker\Circuit;
 final class LinearRetryPolicy implements RetryPolicyInterface
 {
     public function __construct(
-        private readonly int $initialTtl = 600,
-        private readonly int $maximumTtl = 86400,
-        private readonly int $step = 600,
+        private readonly int $startSleepSeconds = 10,
+        private readonly int $maxSleepSeconds = 86400,
+        private readonly int $step = 60,
     ) {
-        if ($this->initialTtl < 0) {
-            throw new \InvalidArgumentException('Initial TTL can not be negative number.');
+        if ($this->startSleepSeconds < 0) {
+            throw new \InvalidArgumentException('Start sleep value value can not be negative number.');
         }
 
         if ($this->step <= 0) {
             throw new \InvalidArgumentException('Step value must be positive number.');
         }
 
-        if ($this->maximumTtl <= 0 || $this->initialTtl > $this->maximumTtl) {
-            throw new \InvalidArgumentException('Maximum TTL must be positive and greater than initial TTL.');
+        if ($this->maxSleepSeconds <= 0 || $this->startSleepSeconds > $this->maxSleepSeconds) {
+            throw new \InvalidArgumentException('Maximum sleep value must be positive and greater than start sleep.');
         }
     }
 
@@ -35,6 +35,6 @@ final class LinearRetryPolicy implements RetryPolicyInterface
     {
         $retries = max(0, $circuit->getFailureCount() - $circuit->getFailureThreshold());
 
-        return min($this->maximumTtl, $this->initialTtl + ($retries * $this->step));
+        return min($this->maxSleepSeconds, $this->startSleepSeconds + ($retries * $this->step));
     }
 }

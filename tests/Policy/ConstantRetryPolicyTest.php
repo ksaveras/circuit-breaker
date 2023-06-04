@@ -18,7 +18,7 @@ final class ConstantRetryPolicyTest extends TestCase
     public function testNegativeTtl(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('TTL value must be a positive integer.');
+        $this->expectExceptionMessage('Sleep seconds value must be a positive integer.');
 
         new ConstantRetryPolicy(-1);
     }

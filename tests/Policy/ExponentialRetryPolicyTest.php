@@ -18,7 +18,7 @@ final class ExponentialRetryPolicyTest extends TestCase
     public function testNegativeInitialTimeout(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Initial timeout can not be negative number.');
+        $this->expectExceptionMessage('Start sleep value can not be negative number.');
 
         new ExponentialRetryPolicy(-1, 10);
     }
@@ -34,7 +34,7 @@ final class ExponentialRetryPolicyTest extends TestCase
     public function testNegativeMaximumTimeoutValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Maximum timeout must be positive and greater than initial timeout.');
+        $this->expectExceptionMessage('Maximum sleep value must be positive and greater than initial timeout.');
 
         new ExponentialRetryPolicy(1, -1);
     }
@@ -42,7 +42,7 @@ final class ExponentialRetryPolicyTest extends TestCase
     public function testInvalidMaximumTimeoutValue(): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Maximum timeout must be positive and greater than initial timeout.');
+        $this->expectExceptionMessage('Maximum sleep value must be positive and greater than initial timeout.');
 
         new ExponentialRetryPolicy(10, 2);
     }
