@@ -11,7 +11,6 @@ namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
-use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
