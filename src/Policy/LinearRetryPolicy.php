@@ -14,9 +14,9 @@ use Ksaveras\CircuitBreaker\Circuit;
 final class LinearRetryPolicy implements RetryPolicyInterface
 {
     public function __construct(
-        private readonly int $startSleepSeconds = 10,
-        private readonly int $maxSleepSeconds = 86400,
-        private readonly int $step = 60,
+        private readonly int $startSleepSeconds,
+        private readonly int $maxSleepSeconds,
+        private readonly int $step,
     ) {
         if ($this->startSleepSeconds < 0) {
             throw new \InvalidArgumentException('Start sleep value value can not be negative number.');
@@ -36,5 +36,10 @@ final class LinearRetryPolicy implements RetryPolicyInterface
         $retries = max(0, $circuit->getFailureCount() - $circuit->getFailureThreshold());
 
         return min($this->maxSleepSeconds, $this->startSleepSeconds + ($retries * $this->step));
+    }
+
+    public function initialDelay(): int
+    {
+        return $this->startSleepSeconds;
     }
 }

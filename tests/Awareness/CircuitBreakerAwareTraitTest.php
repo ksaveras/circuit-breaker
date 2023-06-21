@@ -20,7 +20,12 @@ final class CircuitBreakerAwareTraitTest extends TestCase
 {
     public function testTraitMethods(): void
     {
-        $circuitBreaker = new CircuitBreaker('demo', 3, new ConstantRetryPolicy(), new InMemoryStorage());
+        $circuitBreaker = new CircuitBreaker(
+            'demo',
+            3,
+            new ConstantRetryPolicy(10),
+            new InMemoryStorage(),
+        );
 
         $service = new MockObject();
 

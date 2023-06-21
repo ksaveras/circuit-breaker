@@ -85,7 +85,7 @@ final class CircuitBreaker implements CircuitBreakerInterface
     private function getCircuit(): Circuit
     {
         if (null === $circuit = $this->storage->fetch($this->name)) {
-            return new Circuit($this->name, $this->failureThreshold);
+            return new Circuit($this->name, $this->failureThreshold, $this->retryPolicy->initialDelay());
         }
 
         return $circuit;

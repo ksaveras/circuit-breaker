@@ -77,9 +77,9 @@ final class CircuitBuilder
         return new Circuit(
             $this->name,
             $this->failureThreshold,
+            $this->resetTimeout,
             $this->failureCount,
             $this->lastFailure,
-            $this->resetTimeout
         );
     }
 }

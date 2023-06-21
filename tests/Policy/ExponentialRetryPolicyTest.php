@@ -49,7 +49,7 @@ final class ExponentialRetryPolicyTest extends TestCase
 
     public function testCalculateRetryTtl(): void
     {
-        $policy = new ExponentialRetryPolicy(0);
+        $policy = new ExponentialRetryPolicy(0, 100);
 
         $circuit = CircuitBuilder::new()
             ->withFailureCount(2)

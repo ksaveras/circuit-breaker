@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 final class ConstantRetryPolicy implements RetryPolicyInterface
 {
     public function __construct(
-        private readonly int $sleepSeconds = 600
+        private readonly int $sleepSeconds
     ) {
         if ($this->sleepSeconds < 0) {
             throw new \InvalidArgumentException('Sleep seconds value must be a positive integer.');
@@ -22,6 +22,11 @@ final class ConstantRetryPolicy implements RetryPolicyInterface
     }
 
     public function calculate(Circuit $circuit): int
+    {
+        return $this->sleepSeconds;
+    }
+
+    public function initialDelay(): int
     {
         return $this->sleepSeconds;
     }

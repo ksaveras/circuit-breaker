@@ -10,7 +10,7 @@
 namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
-use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
+use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
 use PHPUnit\Framework\TestCase;
@@ -19,7 +19,7 @@ final class CircuitBreakerFactoryTest extends TestCase
 {
     public function testCreate(): void
     {
-        $factory = new CircuitBreakerFactory(3, new InMemoryStorage(), new ExponentialRetryPolicy());
+        $factory = new CircuitBreakerFactory(3, new InMemoryStorage(), new ConstantRetryPolicy(10));
 
         $circuitBreaker = $factory->create('name');
 
@@ -33,7 +33,7 @@ final class CircuitBreakerFactoryTest extends TestCase
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Failure threshold must be positive non zero number.');
 
-        $factory = new CircuitBreakerFactory(0, new InMemoryStorage(), new ExponentialRetryPolicy());
+        $factory = new CircuitBreakerFactory(0, new InMemoryStorage(), new ConstantRetryPolicy(10));
 
         $factory->create('name');
     }
