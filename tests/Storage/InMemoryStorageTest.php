@@ -19,9 +19,9 @@ final class InMemoryStorageTest extends TestCase
     public function testStorage(): void
     {
         $storage = new InMemoryStorage();
-        $policy = new ConstantRetryPolicy();
+        $policy = new ConstantRetryPolicy(10);
 
-        $storage->save(new Circuit('demo1'));
+        $storage->save(new Circuit('demo1', 3, 10));
 
         $circuit = $storage->fetch('demo1');
         self::assertNotNull($circuit);

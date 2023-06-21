@@ -14,8 +14,8 @@ use Ksaveras\CircuitBreaker\Circuit;
 final class ExponentialRetryPolicy implements RetryPolicyInterface
 {
     public function __construct(
-        private readonly int $startSleepSeconds = 10,
-        private readonly int $maxSleepSeconds = 86400,
+        private readonly int $startSleepSeconds,
+        private readonly int $maxSleepSeconds,
         private readonly float $base = 2.0,
     ) {
         if ($this->startSleepSeconds < 0) {
@@ -36,5 +36,10 @@ final class ExponentialRetryPolicy implements RetryPolicyInterface
         $retries = max(0, $circuit->getFailureCount() - $circuit->getFailureThreshold());
 
         return min($this->maxSleepSeconds, (int) ($this->base ** $retries + $this->startSleepSeconds));
+    }
+
+    public function initialDelay(): int
+    {
+        return $this->startSleepSeconds;
     }
 }

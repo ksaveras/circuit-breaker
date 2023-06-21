@@ -25,10 +25,10 @@ final class Circuit
 
     public function __construct(
         string $name,
-        int $failureThreshold = 5,
+        int $failureThreshold,
+        int $resetTimeout,
         int $failureCount = 0,
         float $lastFailure = null,
-        int $resetTimeout = 60
     ) {
         $this->name = $name;
         $this->failureThreshold = $failureThreshold;

@@ -14,4 +14,6 @@ use Ksaveras\CircuitBreaker\Circuit;
 interface RetryPolicyInterface
 {
     public function calculate(Circuit $circuit): int;
+
+    public function initialDelay(): int;
 }

@@ -51,8 +51,8 @@ final class CircuitTest extends TestCase
 
     public function testGetState(): void
     {
-        $circuit = new Circuit('demo', 2);
-        $policy = new ConstantRetryPolicy();
+        $circuit = new Circuit('demo', 2, 0);
+        $policy = new ConstantRetryPolicy(10);
 
         self::assertEquals(State::CLOSED, $circuit->getState());
 
@@ -73,8 +73,8 @@ final class CircuitTest extends TestCase
         ClockMock::register(Circuit::class);
         ClockMock::withClockMock(strtotime('2020-12-01 10:00:00'));
 
-        $circuit = new Circuit('demo', 2);
-        $policy = new ConstantRetryPolicy();
+        $circuit = new Circuit('demo', 2, 0);
+        $policy = new ConstantRetryPolicy(10);
 
         self::assertEquals(0, $circuit->getFailureCount());
 
