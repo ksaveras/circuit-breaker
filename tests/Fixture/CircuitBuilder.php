@@ -72,7 +72,7 @@ final class CircuitBuilder
         return $builder;
     }
 
-    public function  build(): Circuit
+    public function build(): Circuit
     {
         return new Circuit(
             $this->name,
