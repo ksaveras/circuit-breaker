@@ -28,9 +28,48 @@ final class CircuitBreaker implements CircuitBreakerInterface
         return $this->name;
     }
 
-    public function getState(): State
+    public function state(): State
     {
-        return $this->getCircuit()->getState();
+        return $this->getState($this->getCircuit());
+    }
+
+    public function remainingDelay(): float
+    {
+        $circuit = $this->getCircuit();
+
+        return match ($this->getState($circuit)) {
+            State::CLOSED => 0.0,
+            default => $circuit->getExpirationTime() - microtime(true),
+        };
+    }
+
+    public function getFailureCount(): int
+    {
+        return $this->getCircuit()->getFailureCount();
+    }
+
+    public function isAvailable(): bool
+    {
+        return match ($this->state()) {
+            State::CLOSED,
+            State::HALF_OPEN => true,
+            default => false,
+        };
+    }
+
+    public function isClosed(): bool
+    {
+        return $this->state() === State::CLOSED;
+    }
+
+    public function isHalfOpen(): bool
+    {
+        return $this->state() === State::HALF_OPEN;
+    }
+
+    public function isOpen(): bool
+    {
+        return $this->state() === State::OPEN;
     }
 
     /**
@@ -39,20 +78,19 @@ final class CircuitBreaker implements CircuitBreakerInterface
     public function call(callable $closure): mixed
     {
         $circuit = $this->getCircuit();
-        $state = $circuit->getState();
 
-        switch ($state) {
+        switch ($this->getState($circuit)) {
             case State::CLOSED:
             case State::HALF_OPEN:
                 try {
                     $result = $closure();
                     if (0 !== $circuit->getFailureCount()) {
-                        $this->success();
+                        $this->recordSuccess();
                     }
 
                     return $result;
                 } catch (\Throwable $throwable) {
-                    $this->failure();
+                    $this->recordFailure();
 
                     throw $throwable;
                 }
@@ -61,25 +99,25 @@ final class CircuitBreaker implements CircuitBreakerInterface
         }
     }
 
-    public function isAvailable(): bool
-    {
-        return match ($this->getCircuit()->getState()) {
-            State::CLOSED,
-            State::HALF_OPEN => true,
-            default => false,
-        };
-    }
-
-    public function success(): void
+    public function recordSuccess(): void
     {
         $this->storage->delete($this->name);
     }
 
-    public function failure(): void
+    public function recordFailure(): void
     {
         $circuit = $this->getCircuit();
         $circuit->increaseFailure($this->retryPolicy);
         $this->storage->save($circuit);
+    }
+
+    private function getState(Circuit $circuit): State
+    {
+        if ($circuit->thresholdReached()) {
+            return State::CLOSED;
+        }
+
+        return (microtime(true) - ($circuit->getLastFailure() ?? 0.0)) > $circuit->getResetTimeout() ? State::HALF_OPEN : State::OPEN;
     }
 
     private function getCircuit(): Circuit

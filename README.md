@@ -38,11 +38,26 @@ $circuitBreaker = $factory->create('service-api');
 if ($circuitBreaker->isAvailable()) {
     try {
         // call 3rd party service api
-        $circuitBreaker->success();
+        $circuitBreaker->recordSuccess();
     } catch (\Exception $exception) {
-        $circuitBreaker->failure();
+        $circuitBreaker->recordFailure();
     }
 }
+
+// check if CB is closed
+$circuitBreaker->isClosed();
+
+// check if CB is half open
+$circuitBreaker->isHalfOpen();
+
+// check if CB is open
+$circuitBreaker->isOpen();
+
+// get number of failures
+$circuitBreaker->getFailureCount();
+
+// get CB remaining delay in seconds
+$circuitBreaker->remainingDelay();
 ```
 
 Use callback
@@ -72,7 +87,7 @@ $factory = new CircuitBreakerFactory(
 $circuitBreaker = $factory->create('service-api');
 
 try {
-    $circuitBreaker->call(
+    $result = $circuitBreaker->call(
         function () {
             $this->callApi();
         }

@@ -13,7 +13,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 final class CircuitBuilder
 {
-    private string $name = 'CB item';
+    private string $name = 'demo';
 
     private int $failureCount = 3;
 
@@ -72,7 +72,7 @@ final class CircuitBuilder
         return $builder;
     }
 
-    public function build(): Circuit
+    public function  build(): Circuit
     {
         return new Circuit(
             $this->name,

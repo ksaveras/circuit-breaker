@@ -24,7 +24,7 @@ final class CircuitBreakerFactoryTest extends TestCase
         $circuitBreaker = $factory->create('name');
 
         self::assertEquals('name', $circuitBreaker->getName());
-        self::assertEquals(State::CLOSED, $circuitBreaker->getState());
+        self::assertEquals(State::CLOSED, $circuitBreaker->state());
         self::assertTrue($circuitBreaker->isAvailable());
     }
 

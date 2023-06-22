@@ -9,87 +9,150 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests;
 
+use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\CircuitBreaker;
-use Ksaveras\CircuitBreaker\Exception\CircuitBreakerException;
+use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Storage\InMemoryStorage;
+use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
 final class CircuitBreakerTest extends TestCase
 {
-    private CircuitBreaker $service;
+    private InMemoryStorage $storage;
+    private CircuitBreaker $circuitBreaker;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->service = new CircuitBreaker(
+        $this->storage = new InMemoryStorage();
+
+        $this->circuitBreaker = new CircuitBreaker(
             'demo',
             2,
             new ConstantRetryPolicy(50),
-            new InMemoryStorage()
+            $this->storage
         );
     }
 
     public function testReturnsName(): void
     {
-        self::assertEquals('demo', $this->service->getName());
+        self::assertEquals('demo', $this->circuitBreaker->getName());
     }
 
-    public function testNewCircuitBreakerIsClosed(): void
+    #[DataProvider('providesCircuitStateChecks')]
+    public function testState(Circuit $circuit, State $state): void
     {
-        self::assertEquals(State::CLOSED, $this->service->getState());
+        $this->storage->save($circuit);
+
+        self::assertSame($state, $this->circuitBreaker->state());
+
+        $result = match ($state) {
+            State::CLOSED => $this->circuitBreaker->isClosed(),
+            State::HALF_OPEN => $this->circuitBreaker->isHalfOpen(),
+            State::OPEN => $this->circuitBreaker->isOpen(),
+        };
+        self::assertTrue($result);
     }
 
-    public function testSuccessCallback(): void
+    public static function providesCircuitStateChecks(): iterable
     {
-        $result = $this->service->call($this->successClosure());
+        $builder = CircuitBuilder::new()
+            ->withFailureCount(0)
+            ->withFailureThreshold(3)
+            ->withResetTimeout(10)
+            ->withLastFailure(microtime(true));
+
+        return [
+            'closed' => [$builder->build(), State::CLOSED],
+            'threshold not reached' => [$builder->withFailureCount(2)->build(), State::CLOSED],
+            'half open' => [
+                $builder->withFailureCount(4)->withLastFailure(microtime(true) - 15)->build(),
+                State::HALF_OPEN,
+            ],
+            'open' => [$builder->withFailureCount(4)->build(), State::OPEN],
+        ];
+    }
+
+    public function testClosedCircuitRemainingDelay(): void
+    {
+        $this->storage->save(CircuitBuilder::new()->withFailureCount(0)->build());
+
+        self::assertSame(0.0, $this->circuitBreaker->remainingDelay());
+    }
+
+    public function testOpenCircuitRemainingDelay(): void
+    {
+        $this->storage->save(
+            CircuitBuilder::new()
+                ->withFailureCount(10)
+                ->withLastFailure(microtime(true) - 100)
+                ->withResetTimeout(60)
+                ->build()
+        );
+
+        self::assertEqualsWithDelta(60.0, $this->circuitBreaker->remainingDelay(), 1.0);
+    }
+
+    public function testFailureCount(): void
+    {
+        $this->storage->save(
+            CircuitBuilder::new()
+                ->withFailureCount(10)
+                ->build()
+        );
+
+        self::assertSame(10, $this->circuitBreaker->getFailureCount());
+    }
+
+    public function testSuccessCallbackReturnsResult(): void
+    {
+        $result = $this->circuitBreaker->call($this->successClosure());
 
         self::assertEquals('success', $result);
-        self::assertEquals(State::CLOSED, $this->service->getState());
+        self::assertTrue($this->circuitBreaker->isClosed());
     }
 
-    public function testServiceIsAvailableCallback(): void
+    public function testOpenCircuitException(): void
     {
-        self::assertTrue($this->service->isAvailable());
+        $this->expectException(OpenCircuitException::class);
 
-        $this->service->call($this->successClosure());
+        $this->storage->save(
+            CircuitBuilder::new()
+                ->withFailureCount(3)
+                ->withLastFailure(microtime(true))
+                ->withResetTimeout(60)
+                ->build()
+        );
 
-        self::assertTrue($this->service->isAvailable());
+        self::assertTrue($this->circuitBreaker->isOpen());
+
+        $this->circuitBreaker->call($this->failingClosure());
     }
 
-    public function testFailureThreshold(): void
+    public function testOpenCircuitExceptionResetTimeoutNotExpired(): void
     {
-        try {
-            $this->service->call($this->failingClosure());
-        } catch (\Exception $exception) {
-            self::assertInstanceOf(\RuntimeException::class, $exception);
-        }
+        $this->expectException(OpenCircuitException::class);
 
-        self::assertEquals(State::CLOSED, $this->service->getState());
+        $this->storage->save(
+            CircuitBuilder::new()
+                ->withFailureCount(3)
+                ->withLastFailure(microtime(true))
+                ->withResetTimeout(60)
+                ->build()
+        );
 
-        try {
-            $this->service->call($this->failingClosure());
-        } catch (\Exception $exception) {
-            self::assertInstanceOf(\RuntimeException::class, $exception);
-        }
+        self::assertTrue($this->circuitBreaker->isOpen());
 
-        self::assertEquals(State::OPEN, $this->service->getState());
-
-        try {
-            $this->service->call($this->failingClosure());
-        } catch (\Exception $exception) {
-            self::assertInstanceOf(CircuitBreakerException::class, $exception);
-        }
-
-        self::assertEquals(State::OPEN, $this->service->getState());
+        $this->circuitBreaker->call($this->successClosure());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testResetPeriod(): void
     {
         ClockMock::register(self::class);
@@ -98,59 +161,70 @@ final class CircuitBreakerTest extends TestCase
         ClockMock::withClockMock(true);
 
         try {
-            $this->service->call($this->failingClosure());
+            $this->circuitBreaker->call($this->failingClosure());
         } catch (\Exception) {
         }
 
-        self::assertEquals(State::CLOSED, $this->service->getState());
+        self::assertTrue($this->circuitBreaker->isClosed());
 
         try {
-            $this->service->call($this->failingClosure());
+            $this->circuitBreaker->call($this->failingClosure());
         } catch (\Exception) {
         }
 
-        self::assertEquals(State::OPEN, $this->service->getState());
+        self::assertTrue($this->circuitBreaker->isOpen());
 
         sleep(100);
 
-        $this->service->call($this->successClosure());
+        $this->circuitBreaker->call($this->successClosure());
 
-        self::assertEquals(State::CLOSED, $this->service->getState());
+        self::assertTrue($this->circuitBreaker->isClosed());
 
         ClockMock::withClockMock(false);
     }
 
-    public function testResetWhenServiceBecomesAvailable(): void
+    public function testResetWhenServiceBecomesAvailableAndThresholdNotReached(): void
     {
-        $this->service->failure();
-        $this->service->call($this->successClosure());
+        $this->storage->save(
+            CircuitBuilder::new()
+                ->withFailureCount(1)
+                ->withLastFailure(microtime(true))
+                ->withResetTimeout(60)
+                ->build()
+        );
 
-        self::assertEquals(State::CLOSED, $this->service->getState());
+        $this->circuitBreaker->call($this->successClosure());
+
+        self::assertTrue($this->circuitBreaker->isClosed());
+        self::assertSame(0, $this->circuitBreaker->getFailureCount());
+    }
+
+    public function testResetHalfOpenWhenServiceBecomesAvailable(): void
+    {
+        $this->storage->save(
+            CircuitBuilder::new()
+                ->withFailureCount(10)
+                ->withLastFailure(microtime(true) - 100)
+                ->withResetTimeout(60)
+                ->build()
+        );
+
+        $this->circuitBreaker->call($this->successClosure());
+
+        self::assertTrue($this->circuitBreaker->isClosed());
+        self::assertSame(0, $this->circuitBreaker->getFailureCount());
     }
 
     public function testCircuitFunctions(): void
     {
-        $circuitBreaker = $this->createCircuitBreaker();
+        $this->circuitBreaker->recordFailure();
+        $this->circuitBreaker->recordFailure();
 
-        $circuitBreaker->failure();
-        $circuitBreaker->failure();
+        self::assertTrue($this->circuitBreaker->isOpen());
 
-        self::assertFalse($circuitBreaker->isAvailable());
+        $this->circuitBreaker->recordSuccess();
 
-        $circuitBreaker->success();
-
-        self::assertTrue($circuitBreaker->isAvailable());
-        self::assertEquals(State::CLOSED, $circuitBreaker->getState());
-    }
-
-    private function createCircuitBreaker(): CircuitBreaker
-    {
-        return new CircuitBreaker(
-            'demo',
-            2,
-            new ConstantRetryPolicy(50),
-            new InMemoryStorage()
-        );
+        self::assertTrue($this->circuitBreaker->isClosed());
     }
 
     private function failingClosure(): \Closure
