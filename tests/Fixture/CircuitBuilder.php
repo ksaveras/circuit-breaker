@@ -13,7 +13,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 
 final class CircuitBuilder
 {
-    private string $name = 'CB item';
+    private string $name = 'demo';
 
     private int $failureCount = 3;
 

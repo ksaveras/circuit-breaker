@@ -13,13 +13,23 @@ interface CircuitBreakerInterface
 {
     public function getName(): string;
 
-    public function getState(): State;
+    public function remainingDelay(): float;
+
+    public function getFailureCount(): int;
+
+    public function state(): State;
 
     public function isAvailable(): bool;
 
+    public function isClosed(): bool;
+
+    public function isHalfOpen(): bool;
+
+    public function isOpen(): bool;
+
     public function call(callable $closure): mixed;
 
-    public function success(): void;
+    public function recordSuccess(): void;
 
-    public function failure(): void;
+    public function recordFailure(): void;
 }

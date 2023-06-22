@@ -37,23 +37,9 @@ final class Circuit
         $this->resetTimeout = $resetTimeout;
     }
 
-    public function __toString(): string
-    {
-        return $this->name;
-    }
-
     public function getName(): string
     {
         return $this->name;
-    }
-
-    public function getState(): State
-    {
-        if ($this->failureCount < $this->failureThreshold) {
-            return State::CLOSED;
-        }
-
-        return (microtime(true) - ($this->lastFailure ?? 0.0)) > $this->getExpirationTime() ? State::HALF_OPEN : State::OPEN;
     }
 
     public function getFailureCount(): int
@@ -71,6 +57,11 @@ final class Circuit
     public function getFailureThreshold(): int
     {
         return $this->failureThreshold;
+    }
+
+    public function thresholdReached(): bool
+    {
+        return $this->failureCount < $this->failureThreshold;
     }
 
     public function getLastFailure(): ?float

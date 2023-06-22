@@ -11,7 +11,6 @@ namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
-use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
@@ -28,7 +27,7 @@ final class CircuitTest extends TestCase
 
         self::assertInstanceOf(Circuit::class, $circuit);
 
-        self::assertEquals($initial->getName(), (string) $circuit);
+        self::assertEquals($initial->getName(), $circuit->getName());
         self::assertEquals($initial->getFailureCount(), $circuit->getFailureCount());
         self::assertEquals($initial->getLastFailure(), $circuit->getLastFailure());
         self::assertEquals($initial->getFailureThreshold(), $circuit->getFailureThreshold());
@@ -47,22 +46,6 @@ final class CircuitTest extends TestCase
         self::assertEquals(0, $circuit->getFailureCount());
         self::assertNull($circuit->getLastFailure());
         self::assertEquals(120, $circuit->getResetTimeout());
-    }
-
-    public function testGetState(): void
-    {
-        $circuit = new Circuit('demo', 2, 0);
-        $policy = new ConstantRetryPolicy(10);
-
-        self::assertEquals(State::CLOSED, $circuit->getState());
-
-        $circuit->increaseFailure($policy);
-
-        self::assertEquals(State::CLOSED, $circuit->getState());
-
-        $circuit->increaseFailure($policy);
-
-        self::assertEquals(State::OPEN, $circuit->getState());
     }
 
     /**
