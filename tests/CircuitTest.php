@@ -11,7 +11,6 @@ namespace Ksaveras\CircuitBreaker\Tests;
 
 use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
-use Ksaveras\CircuitBreaker\State;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;

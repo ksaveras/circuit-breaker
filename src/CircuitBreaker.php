@@ -59,17 +59,17 @@ final class CircuitBreaker implements CircuitBreakerInterface
 
     public function isClosed(): bool
     {
-        return $this->state() === State::CLOSED;
+        return State::CLOSED === $this->state();
     }
 
     public function isHalfOpen(): bool
     {
-        return $this->state() === State::HALF_OPEN;
+        return State::HALF_OPEN === $this->state();
     }
 
     public function isOpen(): bool
     {
-        return $this->state() === State::OPEN;
+        return State::OPEN === $this->state();
     }
 
     /**

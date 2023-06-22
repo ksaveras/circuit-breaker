@@ -24,6 +24,7 @@ use Symfony\Bridge\PhpUnit\ClockMock;
 final class CircuitBreakerTest extends TestCase
 {
     private InMemoryStorage $storage;
+
     private CircuitBreaker $circuitBreaker;
 
     protected function setUp(): void
@@ -60,6 +61,9 @@ final class CircuitBreakerTest extends TestCase
         self::assertTrue($result);
     }
 
+    /**
+     * @return iterable<string, array<int, Circuit|State>>
+     */
     public static function providesCircuitStateChecks(): iterable
     {
         $builder = CircuitBuilder::new()
