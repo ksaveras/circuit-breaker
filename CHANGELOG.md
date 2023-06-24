@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.0.1](https://www.github.com/ksaveras/circuit-breaker/compare/v2.0.0...v2.0.1) (2023-06-24)
+
+
+### Bug Fixes
+
+* Add psr/http-message 1.0 support ([#16](https://www.github.com/ksaveras/circuit-breaker/issues/16)) ([23eaf3f](https://www.github.com/ksaveras/circuit-breaker/commit/23eaf3fd9e44843b8699a0e4839910bbb501d8f5))
+
 ## [2.0.0](https://www.github.com/ksaveras/circuit-breaker/compare/v1.0.0...v2.0.0) (2023-06-24)
 
 
