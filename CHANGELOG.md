@@ -1,5 +1,12 @@
 # Changelog
 
+### [2.0.2](https://www.github.com/ksaveras/circuit-breaker/compare/v2.0.1...v2.0.2) (2023-06-24)
+
+
+### Bug Fixes
+
+* Use Symfony Clock 6.3 lowest version ([#18](https://www.github.com/ksaveras/circuit-breaker/issues/18)) ([f46ddd4](https://www.github.com/ksaveras/circuit-breaker/commit/f46ddd4dc72306f497fa822f87e44c045eb3b5e5))
+
 ### [2.0.1](https://www.github.com/ksaveras/circuit-breaker/compare/v2.0.0...v2.0.1) (2023-06-24)
 
 
