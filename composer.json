@@ -2,7 +2,13 @@
     "name": "ksaveras/circuit-breaker",
     "type": "library",
     "description": "Circuit Breaker library",
-    "keywords": ["circuit breaker", "graceful", "error handling", "fault tolerance", "microservices"],
+    "keywords": [
+        "circuit breaker",
+        "graceful",
+        "error handling",
+        "fault tolerance",
+        "microservices"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -45,9 +51,14 @@
         "rector:fix": "@php ./vendor/bin/rector process",
         "test": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit",
         "test:coverage": "@php -dapc.enable_cli=1 ./vendor/bin/phpunit --coverage-clover=coverage/clover.xml",
-        "static-analysis": ["@phpcs", "@phpstan", "@rector"]
+        "static-analysis": [
+            "@phpcs",
+            "@phpstan",
+            "@rector"
+        ]
     },
     "config": {
         "sort-packages": true
-    }
+    },
+    "version": "2.0.0"
 }
