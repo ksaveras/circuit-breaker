@@ -3,7 +3,6 @@
          bootstrap="vendor/autoload.php"
          executionOrder="depends,defects"
          beStrictAboutOutputDuringTests="true"
-         cacheDirectory=".phpunit.cache"
          beStrictAboutCoverageMetadata="true"
          cacheResult="false"
 >
