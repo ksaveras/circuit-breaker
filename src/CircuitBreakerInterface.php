@@ -9,6 +9,8 @@
  */
 namespace Ksaveras\CircuitBreaker;
 
+use Psr\Http\Message\ResponseInterface;
+
 interface CircuitBreakerInterface
 {
     public function getName(): string;
@@ -32,4 +34,6 @@ interface CircuitBreakerInterface
     public function recordSuccess(): void;
 
     public function recordFailure(): void;
+
+    public function recordRequestFailure(ResponseInterface $response): void;
 }

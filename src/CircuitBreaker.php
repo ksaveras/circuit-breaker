@@ -10,8 +10,11 @@
 namespace Ksaveras\CircuitBreaker;
 
 use Ksaveras\CircuitBreaker\Exception\OpenCircuitException;
+use Ksaveras\CircuitBreaker\HeaderPolicy\HttpHeaderPolicy;
+use Ksaveras\CircuitBreaker\HeaderPolicy\PolicyChain;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
+use Psr\Http\Message\ResponseInterface;
 
 final class CircuitBreaker implements CircuitBreakerInterface
 {
@@ -19,7 +22,8 @@ final class CircuitBreaker implements CircuitBreakerInterface
         private readonly string $name,
         private readonly int $failureThreshold,
         private readonly RetryPolicyInterface $retryPolicy,
-        private readonly StorageInterface $storage
+        private readonly StorageInterface $storage,
+        private readonly HttpHeaderPolicy $headerPolicy = new PolicyChain([]),
     ) {
     }
 
@@ -108,6 +112,25 @@ final class CircuitBreaker implements CircuitBreakerInterface
     {
         $circuit = $this->getCircuit();
         $circuit->increaseFailure($this->retryPolicy);
+        $this->storage->save($circuit);
+    }
+
+    public function recordRequestFailure(ResponseInterface $response): void
+    {
+        if (null === $resetDateTime = $this->headerPolicy->fromResponse($response)) {
+            $this->recordFailure();
+
+            return;
+        }
+
+        $circuit = new Circuit(
+            $this->name,
+            1,
+            $resetDateTime->getTimestamp() - time(),
+            1,
+            microtime(true),
+        );
+
         $this->storage->save($circuit);
     }
 
