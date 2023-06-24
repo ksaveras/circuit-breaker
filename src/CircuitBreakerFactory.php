@@ -9,6 +9,8 @@
  */
 namespace Ksaveras\CircuitBreaker;
 
+use Ksaveras\CircuitBreaker\HeaderPolicy\HttpHeaderPolicy;
+use Ksaveras\CircuitBreaker\HeaderPolicy\PolicyChain;
 use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 
@@ -17,7 +19,8 @@ final class CircuitBreakerFactory
     public function __construct(
         private readonly int $failureThreshold,
         private readonly StorageInterface $storage,
-        private readonly RetryPolicyInterface $retryPolicy
+        private readonly RetryPolicyInterface $retryPolicy,
+        private readonly HttpHeaderPolicy $headerPolicy = new PolicyChain([]),
     ) {
         if (0 >= $this->failureThreshold) {
             throw new \InvalidArgumentException('Failure threshold must be positive non zero number.');
@@ -26,6 +29,12 @@ final class CircuitBreakerFactory
 
     public function create(string $name): CircuitBreaker
     {
-        return new CircuitBreaker($name, $this->failureThreshold, $this->retryPolicy, $this->storage);
+        return new CircuitBreaker(
+            $name,
+            $this->failureThreshold,
+            $this->retryPolicy,
+            $this->storage,
+            $this->headerPolicy,
+        );
     }
 }

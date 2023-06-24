@@ -7,8 +7,9 @@ More information: https://martinfowler.com/bliki/CircuitBreaker.html
 composer require ksaveras/circuit-breaker
 ```
 
-## Use
+## Use cases
 
+### Basic example
 Simple circuit check using Symfony Redis cache
 
 ```php
@@ -60,7 +61,7 @@ $circuitBreaker->getFailureCount();
 $circuitBreaker->remainingDelay();
 ```
 
-Use callback
+### Use callback
 
 ```php
 use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
@@ -96,6 +97,49 @@ try {
     // Open circuit
 } catch (\Exception $exception) {
     // 3rd party exception
+}
+```
+
+### Use Retry-After response header policy
+
+```php
+use Ksaveras\CircuitBreaker\CircuitBreakerFactory;
+use Ksaveras\CircuitBreaker\HeaderPolicy\PolicyChain;
+use Ksaveras\CircuitBreaker\HeaderPolicy\RateLimitPolicy;
+use Ksaveras\CircuitBreaker\HeaderPolicy\RetryAfterPolicy;
+use Ksaveras\CircuitBreaker\Policy\ExponentialRetryPolicy;
+use Ksaveras\CircuitBreaker\Storage\CacheStorage;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+
+$redisAdapter = new RedisAdapter(
+    RedisAdapter::createConnection('redis://localhost'),
+    // the namespace for circuit breaker storage
+    'circuit-breaker',
+    // max TTL is set to 24 hours
+    86400
+);
+
+$factory = new CircuitBreakerFactory(
+    // max 3 failures before setting circuit breaker as open
+    3,
+    new CacheStorage($redisAdapter),
+    // exponential retry starting with 30 seconds
+    new ExponentialRetryPolicy(30),
+    // check for Retry-After or X-Rate-Limit-Reset headers
+    new PolicyChain(
+        new RetryAfterPolicy(),
+        new RateLimitPolicy(),
+    ),
+);
+
+$circuitBreaker = $factory->create('service-api');
+
+// \Psr\Http\Message\ResponseInterface
+$response = $apiClient->call();
+
+// Too Many Requests
+if ($response->getStatusCode() === 429) {
+    $circuitBreaker->recordRequestFailure($response);
 }
 ```
 

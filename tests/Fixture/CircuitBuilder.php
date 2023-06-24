@@ -15,7 +15,7 @@ final class CircuitBuilder
 {
     private string $name = 'demo';
 
-    private int $failureCount = 3;
+    private int $failureCount = 0;
 
     private ?float $lastFailure = null;
 

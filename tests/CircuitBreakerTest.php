@@ -19,6 +19,7 @@ use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
+use Psr\Http\Message\ResponseInterface;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
 final class CircuitBreakerTest extends TestCase
@@ -229,6 +230,23 @@ final class CircuitBreakerTest extends TestCase
         $this->circuitBreaker->recordSuccess();
 
         self::assertTrue($this->circuitBreaker->isClosed());
+    }
+
+    public function testRequestFailureWithoutPolicy(): void
+    {
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getHeader')
+            ->willReturnMap([
+                ['Retry-After', ['600']],
+            ]);
+
+        $this->circuitBreaker->recordRequestFailure($response);
+
+        self::assertTrue($this->circuitBreaker->isClosed());
+
+        $this->circuitBreaker->recordRequestFailure($response);
+
+        self::assertTrue($this->circuitBreaker->isOpen());
     }
 
     private function failingClosure(): \Closure
