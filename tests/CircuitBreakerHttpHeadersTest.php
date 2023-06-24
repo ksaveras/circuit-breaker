@@ -61,7 +61,7 @@ final class CircuitBreakerHttpHeadersTest extends TestCase
         $circuit = $this->storage->fetch($this->circuitBreaker->getName());
         self::assertNotNull($circuit);
         self::assertEquals(1, $circuit->getFailureCount());
-        self::assertEquals(1136214245, $circuit->getResetTimeout());
+        self::assertEquals(3600, $circuit->getResetTimeout());
     }
 
     /**
@@ -72,12 +72,16 @@ final class CircuitBreakerHttpHeadersTest extends TestCase
         return [
             'retry after' => [
                 [
-                    'Retry-After' => ['Mon, 02 Jan 2006 15:04:05 GMT'],
+                    'Retry-After' => [
+                        (new \DateTimeImmutable())->modify('+1 hour')->format(\DATE_RFC7231),
+                    ],
                 ],
             ],
             'rate limit reset' => [
                 [
-                    'X-RateLimit-Reset' => ['Mon, 02 Jan 2006 15:04:05 GMT'],
+                    'X-RateLimit-Reset' => [
+                        (new \DateTimeImmutable())->modify('+1 hour')->format(\DATE_RFC7231),
+                    ],
                     'X-RateLimit-Remaining' => ['0'],
                 ],
             ],

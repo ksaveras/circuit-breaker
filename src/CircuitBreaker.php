@@ -126,7 +126,7 @@ final class CircuitBreaker implements CircuitBreakerInterface
         $circuit = new Circuit(
             $this->name,
             1,
-            $resetDateTime->getTimestamp(),
+            $resetDateTime->getTimestamp() - time(),
             1,
             microtime(true),
         );
