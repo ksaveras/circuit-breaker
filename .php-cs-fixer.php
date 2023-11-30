@@ -31,6 +31,7 @@ return $config
                 'try',
             ],
         ],
+        'blank_lines_before_namespace' => false,
         'declare_strict_types' => true,
         'fopen_flags' => true,
         'header_comment' => ['header' => $header, 'separate' => 'none'],
