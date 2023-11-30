@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://www.github.com/ksaveras/circuit-breaker/compare/v2.0.2...v2.1.0) (2023-11-30)
+
+
+### Features
+
+* Add support for SF 7.0, add PHP 8.3 ([#20](https://www.github.com/ksaveras/circuit-breaker/issues/20)) ([c1e3d7e](https://www.github.com/ksaveras/circuit-breaker/commit/c1e3d7e093dca649c3a0020ed6e28669c5b40d0a))
+
 ### [2.0.2](https://www.github.com/ksaveras/circuit-breaker/compare/v2.0.1...v2.0.2) (2023-06-24)
 
 
