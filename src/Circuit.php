@@ -13,13 +13,13 @@ use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 
 final class Circuit
 {
-    private string $name;
+    private readonly string $name;
 
     private int $failureCount;
 
     private ?float $lastFailure;
 
-    private int $failureThreshold;
+    private readonly int $failureThreshold;
 
     private int $resetTimeout;
 

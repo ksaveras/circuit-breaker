@@ -29,6 +29,6 @@ return static function (RectorConfig $rectorConfig): void {
     $rectorConfig->skip([
         FlipTypeControlToUseExclusiveTypeRector::class,
         NewlineBeforeNewAssignSetRector::class,
-        VarConstantCommentRector::class,
+        // VarConstantCommentRector::class,
     ]);
 };
