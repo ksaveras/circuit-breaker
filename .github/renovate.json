@@ -1,0 +1,15 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "automerge": false,
+  "automergeStrategy": "squash",
+  "extends": [
+    "config:recommended",
+    ":disableDependencyDashboard",
+    ":semanticCommits",
+    "group:phpstan",
+    "group:symfony",
+    "group:unitTest"
+  ],
+  "labels": ["dependencies"],
+  "platformAutomerge": true
+}
