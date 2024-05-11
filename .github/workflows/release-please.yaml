@@ -21,10 +21,9 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
 
-      - uses: google-github-actions/release-please-action@v2
+      - uses: google-github-actions/release-please-action@v4
         id: release
         with:
           token: ${{ steps.app-token.outputs.token }}
-          package-name: ""
           release-type: php
-          default-branch: main
+          config-file: .github/release-please-config.json
