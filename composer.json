@@ -1,6 +1,7 @@
 {
     "name": "ksaveras/circuit-breaker",
     "type": "library",
+    "version": "2.0.2",
     "description": "Circuit Breaker library",
     "keywords": [
         "circuit breaker",
@@ -60,5 +61,7 @@
     "config": {
         "sort-packages": true
     },
-    "version": "2.0.2"
+    "platform": {
+        "php": "8.1.99"
+    }
 }
