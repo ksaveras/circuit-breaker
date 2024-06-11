@@ -34,7 +34,7 @@ jobs:
 
       - if: ${{ github.event_name == 'pull_request' }}
         name: Download artifact
-        uses: dawidd6/action-download-artifact@v3
+        uses: dawidd6/action-download-artifact@v5
         continue-on-error: true
         with:
           workflow: .github/workflows/coverage-report.yaml # this file
