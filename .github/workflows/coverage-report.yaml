@@ -3,11 +3,11 @@ name: Code Coverage
 on:
   pull_request:
   push:
+    paths:
+      - '!.github/**'
+      - '.github/workflows/coverage-report.yaml'
     branches:
       - main
-
-permissions:
-  pull-requests: write
 
 jobs:
   php-tests:
@@ -52,6 +52,7 @@ jobs:
           path: coverage/clover.xml
 
       - name: Coverage Report as Comment (Clover)
+        if: ${{ github.event_name == 'pull_request' }}
         uses: lucassabreu/comment-coverage-clover@main
         with:
           file: coverage/clover.xml
