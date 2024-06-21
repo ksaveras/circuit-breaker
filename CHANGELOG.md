@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.1](https://github.com/ksaveras/circuit-breaker/compare/v2.1.0...v2.1.1) (2024-06-21)
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency rector/rector to v1.1.1 ([#56](https://github.com/ksaveras/circuit-breaker/issues/56)) ([fa05884](https://github.com/ksaveras/circuit-breaker/commit/fa058848b5b8713a700b6a01390c497e28d29d6c))
+
 ## [2.1.0](https://github.com/ksaveras/circuit-breaker/compare/v2.0.2...v2.1.0) (2024-06-20)
 
 
