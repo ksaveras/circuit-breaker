@@ -1,5 +1,15 @@
 # Changelog
 
+## [2.1.1](https://github.com/ksaveras/circuit-breaker/compare/v2.1.0...v2.1.1) (2024-07-25)
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency friendsofphp/php-cs-fixer to v3.60.0 ([#63](https://github.com/ksaveras/circuit-breaker/issues/63)) ([f471060](https://github.com/ksaveras/circuit-breaker/commit/f471060c0e1c0dcecfb648420baf6af414e5756b))
+* **deps:** update dependency phpstan/phpstan to v1.11.6 ([#59](https://github.com/ksaveras/circuit-breaker/issues/59)) ([9580a31](https://github.com/ksaveras/circuit-breaker/commit/9580a31e5ce49891627cb51a3fdf6c8667da3b7a))
+* **deps:** update dependency rector/rector to v1.1.1 ([#56](https://github.com/ksaveras/circuit-breaker/issues/56)) ([fa05884](https://github.com/ksaveras/circuit-breaker/commit/fa058848b5b8713a700b6a01390c497e28d29d6c))
+* **deps:** update dependency rector/rector to v1.2.2 ([#60](https://github.com/ksaveras/circuit-breaker/issues/60)) ([ba0ea58](https://github.com/ksaveras/circuit-breaker/commit/ba0ea58ffee2bf31f3c661d8325137b8cf1e7a38))
+
 ## [2.1.0](https://github.com/ksaveras/circuit-breaker/compare/v2.0.2...v2.1.0) (2024-06-20)
 
 
