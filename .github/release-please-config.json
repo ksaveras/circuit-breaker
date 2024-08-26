@@ -21,7 +21,7 @@
   "initial-version": "2.0.2",
   "include-v-in-tag": true,
   "include-component-in-tag": false,
-  "release-type": "php",
+  "release-type": "simple",
   "packages": {
     ".": {}
   }
