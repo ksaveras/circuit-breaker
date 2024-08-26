@@ -1,5 +1,20 @@
 # Changelog
 
+## [2.1.1](https://github.com/ksaveras/circuit-breaker/compare/v2.1.0...v2.1.1) (2024-08-26)
+
+
+### Miscellaneous Chores
+
+* **deps:** update dependency friendsofphp/php-cs-fixer to v3.60.0 ([#63](https://github.com/ksaveras/circuit-breaker/issues/63)) ([f471060](https://github.com/ksaveras/circuit-breaker/commit/f471060c0e1c0dcecfb648420baf6af414e5756b))
+* **deps:** update dependency friendsofphp/php-cs-fixer to v3.62.0 ([#64](https://github.com/ksaveras/circuit-breaker/issues/64)) ([da782ce](https://github.com/ksaveras/circuit-breaker/commit/da782cec6e9bea167f9a7d5f06fe10ef86ba29a9))
+* **deps:** update dependency phpstan/phpstan to v1.11.11 ([#62](https://github.com/ksaveras/circuit-breaker/issues/62)) ([e3c4ed4](https://github.com/ksaveras/circuit-breaker/commit/e3c4ed480452b77f8da9c99ef5c46abc8ccfdff4))
+* **deps:** update dependency phpstan/phpstan to v1.11.6 ([#59](https://github.com/ksaveras/circuit-breaker/issues/59)) ([9580a31](https://github.com/ksaveras/circuit-breaker/commit/9580a31e5ce49891627cb51a3fdf6c8667da3b7a))
+* **deps:** update dependency phpunit/phpunit to v10.5.30 ([#61](https://github.com/ksaveras/circuit-breaker/issues/61)) ([04bf296](https://github.com/ksaveras/circuit-breaker/commit/04bf29605d4d15af66142664bd7c6399ee5c6fbf))
+* **deps:** update dependency rector/rector to v1.1.1 ([#56](https://github.com/ksaveras/circuit-breaker/issues/56)) ([fa05884](https://github.com/ksaveras/circuit-breaker/commit/fa058848b5b8713a700b6a01390c497e28d29d6c))
+* **deps:** update dependency rector/rector to v1.2.2 ([#60](https://github.com/ksaveras/circuit-breaker/issues/60)) ([ba0ea58](https://github.com/ksaveras/circuit-breaker/commit/ba0ea58ffee2bf31f3c661d8325137b8cf1e7a38))
+* **deps:** update dependency rector/rector to v1.2.4 ([#65](https://github.com/ksaveras/circuit-breaker/issues/65)) ([e819230](https://github.com/ksaveras/circuit-breaker/commit/e81923050b36e42981f2bd25ac63fa4373c0501b))
+* **deps:** update dependency symfony/phpunit-bridge to v7.1.3 ([#58](https://github.com/ksaveras/circuit-breaker/issues/58)) ([c803dd3](https://github.com/ksaveras/circuit-breaker/commit/c803dd3e6e9b1e9e21563f575c8b1e85e3983fa0))
+
 ## [2.1.0](https://github.com/ksaveras/circuit-breaker/compare/v2.0.2...v2.1.0) (2024-06-20)
 
 
