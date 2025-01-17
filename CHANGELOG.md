@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.2](https://github.com/ksaveras/circuit-breaker/compare/v2.1.1...v2.1.2) (2025-01-13)
+
+
+### Bug Fixes
+
+* **deps:** update symfony packages to v7.2.0 ([#90](https://github.com/ksaveras/circuit-breaker/issues/90)) ([32160f4](https://github.com/ksaveras/circuit-breaker/commit/32160f4b69fb070708c175bf62122f68bd2bb3b5))
+
 ## [2.1.1](https://github.com/ksaveras/circuit-breaker/compare/v2.1.0...v2.1.1) (2024-11-07)
 
 
