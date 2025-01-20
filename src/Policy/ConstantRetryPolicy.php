@@ -14,7 +14,7 @@ use Ksaveras\CircuitBreaker\Circuit;
 final class ConstantRetryPolicy implements RetryPolicyInterface
 {
     public function __construct(
-        private readonly int $sleepSeconds
+        private readonly int $sleepSeconds,
     ) {
         if ($this->sleepSeconds < 0) {
             throw new \InvalidArgumentException('Sleep seconds value must be a positive integer.');
