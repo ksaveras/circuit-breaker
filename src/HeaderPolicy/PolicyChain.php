@@ -17,7 +17,7 @@ final class PolicyChain implements HttpHeaderPolicy
      * @param iterable<HttpHeaderPolicy> $policies
      */
     public function __construct(
-        private readonly iterable $policies
+        private readonly iterable $policies,
     ) {
     }
 
