@@ -25,9 +25,7 @@ final class CacheStorage implements StorageInterface
     {
         $item = $this->cache->getItem(sha1($circuit->getName()));
         $item->set($circuit);
-        if (null !== $expiresAfter = $circuit->getResetTimeout()) {
-            $item->expiresAfter($expiresAfter);
-        }
+        $item->expiresAfter($circuit->getResetTimeout());
 
         $this->cache->save($item);
     }
