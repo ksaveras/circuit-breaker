@@ -136,7 +136,7 @@ final class CircuitBreaker implements CircuitBreakerInterface
 
     private function getState(Circuit $circuit): State
     {
-        if ($circuit->thresholdReached()) {
+        if (!$circuit->thresholdReached()) {
             return State::CLOSED;
         }
 

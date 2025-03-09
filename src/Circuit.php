@@ -61,7 +61,7 @@ final class Circuit
 
     public function thresholdReached(): bool
     {
-        return $this->failureCount < $this->failureThreshold;
+        return $this->failureCount >= $this->failureThreshold;
     }
 
     public function getLastFailure(): ?float
