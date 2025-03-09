@@ -16,14 +16,14 @@ use Ksaveras\CircuitBreaker\Policy\RetryPolicyInterface;
 use Ksaveras\CircuitBreaker\Storage\StorageInterface;
 use Psr\Http\Message\ResponseInterface;
 
-final class CircuitBreaker implements CircuitBreakerInterface
+final readonly class CircuitBreaker implements CircuitBreakerInterface
 {
     public function __construct(
-        private readonly string $name,
-        private readonly int $failureThreshold,
-        private readonly RetryPolicyInterface $retryPolicy,
-        private readonly StorageInterface $storage,
-        private readonly HttpHeaderPolicy $headerPolicy = new PolicyChain([]),
+        private string $name,
+        private int $failureThreshold,
+        private RetryPolicyInterface $retryPolicy,
+        private StorageInterface $storage,
+        private HttpHeaderPolicy $headerPolicy = new PolicyChain([]),
     ) {
     }
 
