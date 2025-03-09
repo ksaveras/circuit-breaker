@@ -35,7 +35,9 @@ final class RetryAfterPolicyTest extends TestCase
     public function testHeaders(array $headerValues): void
     {
         $response = $this->createMock(ResponseInterface::class);
-        $response->method('getHeader')
+        $response
+            ->expects(self::once())
+            ->method('getHeader')
             ->with('Retry-After')
             ->willReturn($headerValues);
 
@@ -56,7 +58,9 @@ final class RetryAfterPolicyTest extends TestCase
     public function testRetryAfterSeconds(): void
     {
         $response = $this->createMock(ResponseInterface::class);
-        $response->method('getHeader')
+        $response
+            ->expects(self::once())
+            ->method('getHeader')
             ->with('Retry-After')
             ->willReturn(['600']);
 
@@ -69,7 +73,9 @@ final class RetryAfterPolicyTest extends TestCase
     public function testRetryAfterDateTime(): void
     {
         $response = $this->createMock(ResponseInterface::class);
-        $response->method('getHeader')
+        $response
+            ->expects(self::once())
+            ->method('getHeader')
             ->with('Retry-After')
             ->willReturn([
                 'Fri, 23 Jun 2023 08:00:00 GMT',
