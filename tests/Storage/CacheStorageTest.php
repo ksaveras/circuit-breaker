@@ -9,21 +9,25 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
+use Ksaveras\CircuitBreaker\Circuit;
+use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Storage\CacheStorage;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
+#[UsesClass(Circuit::class)]
+#[UsesClass(CircuitBreaker::class)]
+#[CoversClass(CacheStorage::class)]
 final class CacheStorageTest extends TestCase
 {
     private CacheStorage $storage;
 
-    /**
-     * @var MockObject|CacheItemPoolInterface
-     */
-    private MockObject $pool;
+    private MockObject&CacheItemPoolInterface $pool;
 
     protected function setUp(): void
     {
@@ -115,5 +119,72 @@ final class CacheStorageTest extends TestCase
             ->with(sha1($circuit->getName()));
 
         $this->storage->delete($circuit->getName());
+    }
+
+    public function testClear(): void
+    {
+        $this->pool
+            ->expects(self::once())
+            ->method('clear');
+
+        $this->storage->clear();
+    }
+
+    public function testGetAll(): void
+    {
+        $circuit1 = CircuitBuilder::new()
+            ->withName('circuit1')
+            ->build();
+        $cacheItem1 = $this->createMock(CacheItemInterface::class);
+        $cacheItem1->method('isHit')->willReturn(true);
+        $cacheItem1->method('get')->willReturn($circuit1);
+
+        $circuit2 = CircuitBuilder::new()
+            ->withName('circuit2')
+            ->build();
+        $cacheItem2 = $this->createMock(CacheItemInterface::class);
+        $cacheItem2->method('isHit')->willReturn(true);
+        $cacheItem2->method('get')->willReturn($circuit2);
+
+        $this->pool
+            ->expects(self::once())
+            ->method('getItems')
+            ->willReturn([$cacheItem1, $cacheItem2]);
+
+        $results = $this->storage->getAll();
+
+        self::assertEquals([$circuit1, $circuit2], $results);
+    }
+
+    public function testCleanup(): void
+    {
+        $cacheItem1 = $this->createMock(CacheItemInterface::class);
+        $cacheItem1->method('isHit')->willReturn(false);
+        $cacheItem1->method('getKey')->willReturn(sha1('junk1'));
+
+        $cacheItem2 = $this->createMock(CacheItemInterface::class);
+        $cacheItem2->method('isHit')->willReturn(false);
+        $cacheItem2->method('getKey')->willReturn(sha1('junk2'));
+
+        $circuit = CircuitBuilder::new()
+            ->withFailureCount(0)
+            ->build();
+
+        $validCacheItem = $this->createMock(CacheItemInterface::class);
+        $validCacheItem->method('isHit')->willReturn(true);
+        $validCacheItem->method('get')->willReturn($circuit);
+
+        $this->pool
+            ->expects(self::once())
+            ->method('getItems')
+            ->willReturn([$cacheItem1, $cacheItem2, $validCacheItem]);
+
+        $this->pool
+            ->expects(self::once())
+            ->method('deleteItems')
+            ->with([sha1('junk1'), sha1('junk2')])
+            ->willReturn(true);
+
+        $this->storage->cleanup();
     }
 }

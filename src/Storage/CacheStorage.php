@@ -10,11 +10,12 @@
 namespace Ksaveras\CircuitBreaker\Storage;
 
 use Ksaveras\CircuitBreaker\Circuit;
+use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
-final class CacheStorage implements StorageInterface
+final readonly class CacheStorage implements StorageInterface
 {
-    private readonly CacheItemPoolInterface $cache;
+    private CacheItemPoolInterface $cache;
 
     public function __construct(CacheItemPoolInterface $cache)
     {
@@ -44,5 +45,46 @@ final class CacheStorage implements StorageInterface
     public function delete(string $name): void
     {
         $this->cache->deleteItem(sha1($name));
+    }
+
+    public function clear(): void
+    {
+        $this->cache->clear();
+    }
+
+    /**
+     * @return Circuit[]
+     */
+    public function getAll(): array
+    {
+        $circuits = [];
+
+        foreach ($this->cache->getItems() as $item) {
+            /** @var CacheItemInterface $item */
+            if ($item->isHit()) {
+                $circuit = $item->get();
+                if ($circuit instanceof Circuit) {
+                    $circuits[] = $circuit;
+                }
+            }
+        }
+
+        return $circuits;
+    }
+
+    public function cleanup(): void
+    {
+        $expiredKeys = [];
+
+        foreach ($this->cache->getItems() as $item) {
+            /** @var CacheItemInterface $item */
+            if (!$item->isHit()) {
+                $expiredKeys[] = $item->getKey();
+            }
+        }
+
+        if ([] !== $expiredKeys) {
+            $this->cache->deleteItems($expiredKeys);
+        }
     }
 }
