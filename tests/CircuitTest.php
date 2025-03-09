@@ -12,6 +12,7 @@ namespace Ksaveras\CircuitBreaker\Tests;
 use Ksaveras\CircuitBreaker\Circuit;
 use Ksaveras\CircuitBreaker\Policy\ConstantRetryPolicy;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ClockMock;
 
@@ -48,9 +49,7 @@ final class CircuitTest extends TestCase
         self::assertEquals(120, $circuit->getResetTimeout());
     }
 
-    /**
-     * @runInSeparateProcess
-     */
+    #[RunInSeparateProcess]
     public function testIncreaseFailure(): void
     {
         ClockMock::register(Circuit::class);
