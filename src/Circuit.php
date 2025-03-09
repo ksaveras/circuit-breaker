@@ -85,6 +85,9 @@ final class Circuit
         $this->lastFailure = null;
     }
 
+    /**
+     * @return non-empty-array<string, float|int|null>
+     */
     public function __serialize(): array
     {
         return [
@@ -93,6 +96,9 @@ final class Circuit
         ];
     }
 
+    /**
+     * @param non-empty-array<string, float|int|null> $data
+     */
     public function __unserialize(array $data): void
     {
         [$this->lastFailure, $this->resetTimeout] = array_values($data);

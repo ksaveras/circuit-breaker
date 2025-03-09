@@ -1,11 +1,25 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Cannot use array destructuring on array\\|false\\.$#"
+			message: '#^Cannot use array destructuring on array\|false\.$#'
+			identifier: offsetAccess.nonArray
 			count: 1
 			path: src/Circuit.php
 
 		-
-			message: "#^Method Ksaveras\\\\CircuitBreaker\\\\Circuit\\:\\:__unserialize\\(\\) has parameter \\$data with no value type specified in iterable type array\\.$#"
+			message: '#^Property Ksaveras\\CircuitBreaker\\Circuit\:\:\$failureCount \(int\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Circuit.php
+
+		-
+			message: '#^Property Ksaveras\\CircuitBreaker\\Circuit\:\:\$failureThreshold \(int\) does not accept mixed\.$#'
+			identifier: assign.propertyType
+			count: 1
+			path: src/Circuit.php
+
+		-
+			message: '#^Property Ksaveras\\CircuitBreaker\\Circuit\:\:\$resetTimeout \(int\) does not accept float\|int\|null\.$#'
+			identifier: assign.propertyType
 			count: 1
 			path: src/Circuit.php

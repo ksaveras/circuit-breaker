@@ -30,7 +30,7 @@ final class InMemoryStorage implements StorageInterface
         }
 
         [$expiresAt, $circuitState] = $this->circuits[$name];
-        if (null !== $expiresAt && $expiresAt <= microtime(true)) {
+        if ($expiresAt <= microtime(true)) {
             unset($this->circuits[$name]);
 
             return null;
