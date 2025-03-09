@@ -11,12 +11,12 @@ namespace Ksaveras\CircuitBreaker\Policy;
 
 use Ksaveras\CircuitBreaker\Circuit;
 
-final class LinearRetryPolicy implements RetryPolicyInterface
+final readonly class LinearRetryPolicy implements RetryPolicyInterface
 {
     public function __construct(
-        private readonly int $startSleepSeconds,
-        private readonly int $maxSleepSeconds,
-        private readonly int $step,
+        private int $startSleepSeconds,
+        private int $maxSleepSeconds,
+        private int $step,
     ) {
         if ($this->startSleepSeconds < 0) {
             throw new \InvalidArgumentException('Start sleep value value can not be negative number.');

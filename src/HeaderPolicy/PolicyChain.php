@@ -11,13 +11,13 @@ namespace Ksaveras\CircuitBreaker\HeaderPolicy;
 
 use Psr\Http\Message\ResponseInterface;
 
-final class PolicyChain implements HttpHeaderPolicy
+final readonly class PolicyChain implements HttpHeaderPolicy
 {
     /**
      * @param iterable<HttpHeaderPolicy> $policies
      */
     public function __construct(
-        private readonly iterable $policies,
+        private iterable $policies,
     ) {
     }
 

@@ -12,7 +12,7 @@ namespace Ksaveras\CircuitBreaker\HeaderPolicy;
 use Psr\Http\Message\ResponseInterface;
 use Symfony\Component\Clock\ClockAwareTrait;
 
-final class RetryAfterPolicy implements HttpHeaderPolicy
+final readonly class RetryAfterPolicy implements HttpHeaderPolicy
 {
     use ClockAwareTrait;
 
