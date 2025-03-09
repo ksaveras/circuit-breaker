@@ -48,4 +48,40 @@ final class InMemoryStorage implements StorageInterface
     {
         unset($this->circuits[$name]);
     }
+
+    public function clear(): void
+    {
+        $this->circuits = [];
+    }
+
+    /**
+     * @return Circuit[]
+     */
+    public function getAll(): array
+    {
+        $circuits = [];
+        $time = microtime(true);
+
+        foreach ($this->circuits as [$expiresAt, $circuitState]) {
+            if ($expiresAt > $time) {
+                $circuit = unserialize($circuitState, ['allowed_classes' => [Circuit::class]]);
+                if ($circuit instanceof Circuit) {
+                    $circuits[] = $circuit;
+                }
+            }
+        }
+
+        return $circuits;
+    }
+
+    public function cleanup(): void
+    {
+        $time = microtime(true);
+
+        foreach ($this->circuits as $name => [$expiresAt]) {
+            if ($expiresAt <= $time) {
+                unset($this->circuits[$name]);
+            }
+        }
+    }
 }

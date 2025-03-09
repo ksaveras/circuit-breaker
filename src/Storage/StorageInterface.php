@@ -18,4 +18,13 @@ interface StorageInterface
     public function fetch(string $name): ?Circuit;
 
     public function delete(string $name): void;
+
+    public function clear(): void;
+
+    /**
+     * @return Circuit[]
+     */
+    public function getAll(): array;
+
+    public function cleanup(): void;
 }
