@@ -9,14 +9,19 @@
  */
 namespace Ksaveras\CircuitBreaker\Tests\Storage;
 
+use Ksaveras\CircuitBreaker\Circuit;
+use Ksaveras\CircuitBreaker\CircuitBreaker;
 use Ksaveras\CircuitBreaker\Storage\CacheStorage;
 use Ksaveras\CircuitBreaker\Tests\Fixture\CircuitBuilder;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Cache\CacheItemInterface;
 use Psr\Cache\CacheItemPoolInterface;
 
+#[UsesClass(Circuit::class)]
+#[UsesClass(CircuitBreaker::class)]
 #[CoversClass(CacheStorage::class)]
 final class CacheStorageTest extends TestCase
 {
