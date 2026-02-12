@@ -1,5 +1,27 @@
 # Changelog
 
+## [3.0.0](https://github.com/ksaveras/circuit-breaker/compare/v2.1.2...v3.0.0) (2026-02-12)
+
+
+### ⚠ BREAKING CHANGES
+
+* change classes to readonly for improved immutability ([#118](https://github.com/ksaveras/circuit-breaker/issues/118))
+* correct logic in thresholdReached method for accurate failure threshold evaluation
+* enhance CacheStorage and InMemoryStorage with clear, getAll, and cleanup methods ([#117](https://github.com/ksaveras/circuit-breaker/issues/117))
+* bump PHP requirements ([#111](https://github.com/ksaveras/circuit-breaker/issues/111))
+
+### Features
+
+* bump PHP requirements ([#111](https://github.com/ksaveras/circuit-breaker/issues/111)) ([1b5dd02](https://github.com/ksaveras/circuit-breaker/commit/1b5dd02076e7549043f91448f9b59b54224ad62b))
+* change classes to readonly for improved immutability ([#118](https://github.com/ksaveras/circuit-breaker/issues/118)) ([8dfce15](https://github.com/ksaveras/circuit-breaker/commit/8dfce155db1c4ef0526ec3af9b5cba53d076fcc0))
+* enhance CacheStorage and InMemoryStorage with clear, getAll, and cleanup methods ([#117](https://github.com/ksaveras/circuit-breaker/issues/117)) ([8ef54c1](https://github.com/ksaveras/circuit-breaker/commit/8ef54c1fa29d57123b1d60c8d8511d900a1edb52))
+
+
+### Bug Fixes
+
+* correct logic in thresholdReached method for accurate failure threshold evaluation ([39c8a61](https://github.com/ksaveras/circuit-breaker/commit/39c8a61ea8888d4451e5b2b56fac8dd6f644a435))
+* **deps:** update symfony packages ([#130](https://github.com/ksaveras/circuit-breaker/issues/130)) ([5c31759](https://github.com/ksaveras/circuit-breaker/commit/5c317590b8c65f61ada5fe376500c00bb87f988d))
+
 ## [2.1.2](https://github.com/ksaveras/circuit-breaker/compare/v2.1.1...v2.1.2) (2025-01-13)
 
 
