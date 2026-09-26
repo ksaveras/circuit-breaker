@@ -28,7 +28,7 @@ jobs:
             .release-please-manifest.json
           sparse-checkout-cone-mode: false
 
-      - uses: googleapis/release-please-action@v4
+      - uses: googleapis/release-please-action@v5
         id: release
         with:
           token: ${{ steps.app-token.outputs.token }}
